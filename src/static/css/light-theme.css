@@ -1,0 +1,133 @@
+:root {
+    --employee-bg-color: #b19cd9;
+    --research-group-bg-color: #2fc8e0;
+    --type-bg-color: #9acfe3;
+    --tag-bg-color: #bdbfc0;
+    --placeholder-color: grey;
+    /*--placeholdercolor: #739E82;*/
+    --dark-button-color: grey;
+    --light-button-color: #d4d6d7;
+    --search-button-color: #8ddd77;
+    --default-color: #6bafea;
+    --success-color: #8ddd77;
+    --warning-color: #fcfc64;
+    --danger-color: #dd3a4a;
+}
+
+body {
+    background-color: white;
+    color: black
+}
+
+a {
+    color: black;
+}
+
+a:hover {
+    color: #C8C9CB !important;
+}
+
+.card {
+    color: black;
+}
+
+.card-header{
+    background-color: white;
+}
+
+.card-body {
+    background-color: white;
+}
+
+.card-deck a {
+    color: black;
+}
+
+
+.popover-header{
+    background-color: white;
+}
+
+.popover-body {
+    //background-color: grey;
+}
+
+
+
+.autocomplete-items {
+    color: black;
+}
+
+
+.dropdown-item.active, .dropdown-item:active {
+    color: #fff;
+    text-decoration: none;
+    background-color: #A3A6A9;
+}
+
+
+
+
+.nav-pills .nav-link.active, .nav-pills .show>.nav-link {
+    color: #fff;
+    background-color: #6c757d;
+}
+
+::placeholder {
+    color: white;
+    opacity: 1;
+}
+
+.dropzone .dz-preview.dz-image-preview {
+    background: white !important;
+}
+
+.dropzone {
+    background: white !important;
+}
+
+.page-link {
+    color: black;
+}
+
+.whitetext{
+    color: white !important;
+}
+
+.blacktext{
+    color: black !important;
+}
+
+/*.btn.dropdown-toggle.btn-light{*/
+    /*border: 1px solid #6c757d !important;*/
+    /*border-radius: .25rem !important;*/
+    /*color: var(--placeholder-color) !important;*/
+/*}*/
+
+/*.bootstrap-tagsinput{*/
+    /*color: var(--placeholder-color) !important;*/
+/*}*/
+
+::placeholder{
+    color: var(--placeholder-color) !important;
+}
+
+/*.tag.label.label-info{*/
+    /*background-color: lightgray;*/
+/*}*/
+
+.btn{
+    margin-bottom: 2px;
+}
+
+.form-control{
+    color: var(--placeholder-color) !important;
+}
+
+.caret {
+    display: inline;
+}
+
+.popover{
+    max-width: 100%; /* Max Width of the popover (depending on the container!) */
+}

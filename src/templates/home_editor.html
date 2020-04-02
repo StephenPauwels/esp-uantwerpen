@@ -1,0 +1,54 @@
+{% extends "layout.html" %}
+
+{% block title %}Home Editor{% endblock %}
+
+{% block head %}
+
+<script src="{{ url_for('static', filename='js/lib/ckeditor/ckeditor.js') }}"></script>
+<script src="{{ url_for('static', filename='js/lib/dropzone.js') }}"></script>
+<script src="{{ url_for('static', filename='js/home.js') }}"></script>
+<script src="{{ url_for('static', filename='js/lib/bootstrap4-toggle.min.js') }}"></script>
+
+
+<link rel="stylesheet" href="{{ url_for('static', filename='css/lib/dropzone.css') }}" type="text/css">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/lib/bootstrap4-toggle.min.css') }}" type="text/css">
+
+{% endblock %}
+
+{% block content %}
+
+<div class="container">
+
+<h3 id="description-title" class="my-2">Your description in <input id="description-toggle"
+                                                                 type="checkbox" checked
+                                                                 data-toggle="toggle"
+                                                                 data-onstyle="info" data-on="EN"
+                                                                 data-off="NL"></h3>
+
+    <div id="editor">
+    </div>
+
+    <div class="card my-4" id="documents">
+        <div class="card-body">
+            <h4>Documents</h4>
+            <ul class="list-unstyled d-inline" id="documents-list">
+            </ul>
+        </div>
+    </div>
+
+    <form action="{{ url_for('home.save_document') }}"
+                  class="dropzone my-4"
+                  id="dropzone"></form>
+
+
+
+
+
+    <button name="submitbtn" id="submitbtn" class="btn btn-secondary float-right">Save homepage</button>
+
+</div>
+
+
+
+
+{% endblock %}

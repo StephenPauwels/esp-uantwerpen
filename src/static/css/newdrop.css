@@ -1,0 +1,12 @@
+.dropzone .dz-preview .dz-details .dz-filename:not(:hover) {
+    overflow: hidden;
+    text-overflow: ellipsis; }
+
+.dropzone .dz-filename {
+    opacity: 1;
+}
+
+.dropzone .dz-preview:not(:hover) .dz-image img {
+    -webkit-filter: blur(3px);
+    filter: blur(3px); }
+

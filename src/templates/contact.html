@@ -1,0 +1,39 @@
+{% extends "layout.html" %}
+
+{% block title %}Contact{% endblock %}
+{% block nav_contact %}active{% endblock %}
+
+{% block head %}
+
+    <script src="{{ url_for('static', filename='js/contact.js') }}"></script>
+
+{% endblock %}
+
+{% block content %}
+
+
+<div class="container">
+
+    <h5 style="margin-bottom: 20px">{{ get_text("Contact Message") }}</h5>
+
+    <div class="input-group">
+        <input class="form-control" type="text" id="first-name" name="first-name" placeholder="{{ get_text("First Name") }}"/>
+        <input class="form-control" type="text" id="last-name" name="last-name" placeholder="{{ get_text("Last Name") }}"/>
+        <select class="custom-select" id="role" name="role">
+            <option value="student">Student</option>
+            <option value="employee">{{ get_text("Employee") }}</option>
+        </select>
+    </div>
+
+    <textarea id="message" class="form-control" rows="3" placeholder="{{ get_text("Your message") }}"
+              style="margin-top: 10px"></textarea>
+
+    <br/>
+
+    <button id="send-button" class="btn btn-primary" style="margin-right: 10px">{{ get_text("Send") }}</button>
+    <span id="status"></span>
+
+</div>
+
+
+{% endblock %}

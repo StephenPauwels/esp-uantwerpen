@@ -1,0 +1,16 @@
+.idea
+.idea/vcs.xml
+.idea/
+*.iml
+
+*config.py
+src/config
+latex/
+html/
+src/config.py
+src/login/config.py
+src/static/attachments/
+*/profile_pictures/*
+*.pyc
+venv/
+*/py_cache

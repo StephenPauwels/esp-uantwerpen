@@ -1,0 +1,170 @@
+{% if current_theme == "dark" %}
+
+    {% set navbar_classes="navbar-dark bg-dark" %}
+    {% set login_classes="btn-light" %}
+    {% set logout_classes="btn-outline-light" %}
+    {% set settings_classes="btn-dark" %}
+    {% set secondary_color="bg-info text-white" %}
+
+{% else %}
+
+    {% set navbar_classes="navbar-light bg-light border-bottom" %}
+    {% set login_classes="btn-dark" %}
+    {% set logout_classes="btn-outline-dark" %}
+    {% set settings_classes="btn-light" %}
+    {% set secondary_color="" %}
+
+{% endif %}
+
+<!-- Project extension modal -->
+<div id="extension-modal"></div>
+
+<nav class="navbar navbar-expand-sm fixed-top box-shadow {{ navbar_classes }}">
+
+    <div class="container">
+
+        <!-- UA Image -->
+        <a class="navbar-brand" href="{{ url_for('home.homepage') }}">
+
+            {% if current_theme == "light" %}
+                <img src="{{ url_for('static', filename='images/black-logo.png') }}" height="30" alt="">
+            {% else %}
+                <img src="{{ url_for('static', filename='images/white-logo.png') }}" height="30" alt="">
+            {% endif %}
+
+        </a>
+
+        <!-- Toggle for small screens -->
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarText"
+                aria-controls="navbarText" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+
+        <!-- All other content -->
+        <div class="collapse navbar-collapse" id="navbarText">
+
+            <ul class="navbar-nav mr-auto ml-auto">
+                <li class="nav-item {{ nav_home }}">
+                    <a class="nav-link" href="{{ url_for('home.homepage') }}">{{ get_text("Home") }}</a>
+                </li>
+                <li class="nav-item {{ nav_projects }}">
+                    <a class="nav-link" href="{{ url_for("projects.projects") }}">{{ get_text("Projects") }}</a>
+                </li>
+            </ul>
+
+            {% if current_user.is_authenticated and current_user.role != "student" %}
+
+                <div class="dropdown">
+
+                    <!-- Bell Icon -->
+                    <button style="margin-right: 10px;" id="options" class="btn" type="button" data-toggle="dropdown"
+                            aria-haspopup="true" aria-expanded="false">
+                        {% if current_theme == "light" %}
+                            <span style="font-size:20px; color: rgba(0,0,0,.5);">&#128365;</span>
+                        {% else %}
+                            <span style="font-size: 20px; color:white">&#128365;</span>
+                        {% endif %}
+                        <span class="badge danger-color" id="notification-count"></span>
+                    </button>
+
+                    <!-- Dropdown Items -->
+                    <ul class="dropdown-menu" role="menu" id="notifications">
+                        <script>notifications("{{ current_user.name }}", '{{ get_text("New registration") }}', '{{ get_text("New extension") }}', '{{ current_language }}')</script>
+                    </ul>
+
+                </div>
+
+            {% endif %}
+
+
+            <div class="dropdown">
+
+                <!-- Gear Icon -->
+                <button style="margin-right: 10px" id="options" class="btn {{ settings_classes }}" type="button"
+                        data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    <span style="font-size: 20px;  color: rgba(0,0,0,.4)">&#9881;</span>
+                </button>
+
+                <!-- Dropdown items -->
+                <div class="dropdown-menu dropdown-menu-left" aria-labelledby="options">
+                    {% if current_language == "en" %}
+                        <a class="dropdown-item" href="{{ request.script_root + get_args() + "&lang=nl" }}">Nederlands</a>
+                    {% else %}
+                        <a class="dropdown-item" href="{{ request.script_root + get_args() + "&lang=en" }}">English</a>
+                    {% endif %}
+
+                    {% if current_theme == "light" %}
+                        <a class="dropdown-item"
+                           href="{{ request.script_root + get_args() + "&theme=dark" }}">{{ get_text("Dark Theme") }}</a>
+                    {% else %}
+                        <a class="dropdown-item"
+                           href="{{ request.script_root + get_args() + "&theme=light" }}">{{ get_text("Light Theme") }}</a>
+                    {% endif %}
+
+                    {% if current_user.is_authenticated and (current_user.role == "employee" or current_user.role == "admin") %}
+                        {% if not archive_active %}
+                            <a class="dropdown-item"
+                               href="{{ request.script_root + get_args() + "&archive=true" }}">{{ get_text("Show Archive") }}</a>
+                        {% else %}
+                            <a class="dropdown-item"
+                               href="{{ request.script_root + get_args() + "&archive=false" }}">{{ get_text("Hide Archive") }}</a>
+                        {% endif %}
+                    {% endif %}
+
+                    {% if current_user.is_authenticated and (current_user.role == "admin" or current_user.role == "employee") %}
+                        <hr>
+                        <span class="dropdown-item" style="color: grey; font-size: 14px">{{ get_text("Manage") }}</span>
+                        <a class="dropdown-item"
+                           href="{{ url_for("projects.projects") + "?edit=true" }}">{{ get_text("Projects") }}</a>
+                        <a class="dropdown-item" href="#" id="my-profile">{{ get_text("My Profile") }}</a>
+                        <a class="dropdown-item" href="#" id="my-csv">{{ get_text("project-csv") }}</a>
+
+                        {% if current_user.role == "admin" %}
+                            <a class="dropdown-item"
+                               href="{{ url_for("home.home_editor") }}">{{ get_text("Home Page") }}</a>
+                            <a class="dropdown-item"
+                               href="{{ url_for("manage_lists.modify_lists") }}">{{ get_text("Supporting Lists") }}</a>
+                            <a class="dropdown-item" href="#"
+                               id="extension-confirmation">{{ get_text("Extend Projects") }}</a>
+                        {% endif %}
+                    {% endif %}
+
+                </div>
+
+            </div>
+
+            <!-- Login button -->
+            {% if current_user.is_authenticated %}
+                <form action="{{ url_for('auth.logout') }}">
+                    <button type="submit" class="btn my-2 my-sm-0 {{ logout_classes }}"
+                            id="logout">{{ get_text("Logout") }}</button>
+                </form>
+            {% else %}
+                <form action="{{ url_for('auth.login') }}">
+                    <script> document.cookie = "sessionAction=;expires=Thu, 01 Jan 1970 00:00:01 GMT"</script>
+                    <!-- makes sure session is inactive when logged out -->
+                    <button type="submit" class="btn my-2 my-sm-0 {{ login_classes }}"
+                            id="login">{{ get_text("Login") }}</button>
+                </form>
+            {% endif %}
+        </div>
+
+        <!-- Registration Modal -->
+        <div class="modal fade" id="registrations_modal" tabindex="-1" role="dialog" aria-hidden="true"
+             style="display: none;">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h4 class="modal-title">{{ get_text("Registrations") }}</h4>
+                        <button type="button" class="close" data-dismiss="modal">&times;</button>
+                    </div>
+                    <div class="modal-body">
+
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</nav>
+

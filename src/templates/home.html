@@ -1,0 +1,27 @@
+{% extends "layout.html" %}
+
+{% set nav_home = "active" %}
+
+{% block title %}Home{% endblock %}
+
+{% block content %}
+
+    <div class="container">
+
+        {% if new_user %}
+            <div class="alert alert-success text-center">Welcome to the ESP site! Please complete your profile in the settings tab</div>
+        {% endif %}
+
+        {% if current_language == "nl" %}
+
+        {% include 'home_content_nl.html' %}
+
+        {% else %}
+
+        {% include 'home_content_en.html' %}
+
+        {% endif %}
+
+    </div>
+
+{% endblock %}

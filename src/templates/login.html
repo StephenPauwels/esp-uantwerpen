@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1.0">
+    <title>Login - ESP</title>
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/login.css') }}">
+    <link rel="shortcut icon" type="image/png" href="{{ url_for('static', filename='favicon.ico') }}">
+
+    <script>
+        function username_onchange(text) {
+            if (text.value.indexOf("@") !== -1 || text.value.indexOf(".") !== -1 || text.value.indexOf("\\") !== -1) {
+                //text.style.backgroundColor = "#FFE0E0";
+                document.getElementById('usernamehaswrongsyntax').style.display = 'block';
+            } else {
+                //text.style.backgroundColor = "";
+                document.getElementById('usernamehaswrongsyntax').style.display = 'none';
+            }
+        }
+
+        function setFocus() {
+            if (document.getElementById('username').value.length > 0) {
+                document.getElementById('password').focus();
+            } else {
+                document.getElementById('username').focus();
+            }
+        }
+    </script>
+
+</head>
+<body onload="setFocus()">
+
+<div class="wrapper">
+    <div class="container">
+
+        <div style="text-align:center;margin-bottom:20px;margin-top:0px;font-size:14px;padding-top:10px;">
+            <a href="{{ request.path + "?lang=nl" }}">Nederlands</a>
+            | <a href="{{ request.path + "?lang=en" }}">English</a>
+        </div>
+
+        <header>
+            <img src="{{ url_for('static', filename='images/idpx_logo.png') }}" alt="Universiteit Antwerpen">
+        </header>
+
+        <div class="content">
+            <div class="column one">
+
+                {% if error %}
+                    <b>
+                        <section>
+                            <p id="error" class="form-error">{{ error }}</p>
+                        </section>
+                    </b>
+                {% endif %}
+
+                <form action="{{ url_for('auth.login') }}" method="post">
+
+                    {{ form.hidden_tag() }}
+
+                    <div class="form-element-wrapper" style="margin-top:10px;">
+                        {{ get_text("Username") }} <br>
+                        {{ form.username(class="form-element form-field",
+                                         placeholder=get_text("Short username"),
+                                         pattern="^(?:(?![@\.])[a-zA-Z'-_])+$",
+                                         onchange="username_onchange(this);",
+                                         id="username") }}
+                    </div>
+
+
+                    <div class="form-element-wrapper" id="usernamehaswrongsyntax" style="display:none">
+                        <div style="display:block;font-weight:bold;" class="form-error">
+                            {{ get_text("Wrong syntax") }}
+                        </div>
+                    </div>
+
+                    <div class="form-element-wrapper" style="margin-top:20px;">
+                        {{ get_text("Password") }}<br>
+                        {{ form.password(class="form-element form-field",
+                                         placeholder=get_text("Password"),
+                                         id="password") }}
+                    </div>
+
+                    <div class="form-element-wrapper" style="margin-top: 30px">
+                        {{ form.submit(class="form-element form-button",
+                                       type="submit",
+                                       value=get_text("Login")) }}
+                    </div>
+
+                </form>
+
+
+            </div>
+        </div>
+    </div>
+
+    <footer>
+        <div class="container container-footer">
+            <p class="footer-text">© Universiteit Antwerpen 2018-2019</p>
+        </div>
+    </footer>
+</div>
+
+</body>
+</html>

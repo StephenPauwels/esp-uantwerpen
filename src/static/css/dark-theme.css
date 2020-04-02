@@ -1,0 +1,120 @@
+:root {
+    --employee-bg-color: #b19cd9;
+    --research-group-bg-color: #2fc8e0;
+    --type-bg-color: #76a3ae;
+    --tag-bg-color: #bdbfc0;
+    --dark-placeholder-color: #495057;
+    --light-placeholder-color: white;
+    --dark-button-color: grey;
+    --light-button-color: #d4d6d7;
+    --tag-input-placeholder-color: white;
+    --search-button-color: #8ddd77;
+    --default-color: #779ecb;
+    --success-color: #8ddd77;
+    --warning-color: #fcfc64;
+    --danger-color: #dd3a4a;
+}
+
+body {
+    background-color: #343A40;
+    color: white;
+}
+
+a {
+    color: white;
+}
+
+a:hover {
+    color: #C8C9CB !important;
+}
+
+.card {
+    color: white;
+}
+
+.card-header{
+    background-color: #5C6166;
+}
+
+.card-body {
+    background-color: #484D53;
+}
+
+.card-deck a{
+    color: white;
+}
+
+
+.popover-header {
+    background-color: grey;
+}
+
+.popover-body {
+    background-color: grey;
+}
+
+
+
+.autocomplete-items {
+    color: black;
+}
+
+
+.dropdown-item.active, .dropdown-item:active {
+    color: #fff;
+    text-decoration: none;
+    background-color: #A3A6A9;
+}
+
+
+
+.nav-pills .nav-link.active, .nav-pills .show>.nav-link {
+    color: #fff;
+    background-color: #6c757d;
+}
+
+.page-link.active {
+    background-color: white;
+}
+
+.page-item.active{
+    background-color: white;
+}
+
+::placeholder {
+    color: white;
+    opacity: 1;
+}
+
+.dropzone .dz-preview.dz-image-preview {
+    background: #6c757d !important;
+}
+
+.dropzone {
+    background: #6c757d !important;
+}
+
+.page-link {
+    color: white;
+}
+
+
+::placeholder{
+    color: var(--dark-placeholder-color);
+}
+
+.btn.dropdown-toggle.btn-light{
+    border: 1px solid var(--dark-placeholder-color) !important;
+    border-radius: .25rem !important;
+    color: var(--dark-placeholder-color) !important;
+}
+
+.taginput::placeholder{
+    color: var(--tag-input-placeholder-color) !important;
+}
+
+
+
+.tag.label.label-info{
+    background-color: lightgray;
+}

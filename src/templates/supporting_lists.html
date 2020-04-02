@@ -1,0 +1,104 @@
+{% extends "layout.html" %}
+
+{% block title %}Supporting lists{% endblock %}
+
+{% block head %}
+    <script src='{{ url_for('static', filename='js/supporting_lists.js') }}' type="text/javascript" xmlns=""></script>
+{% endblock %}
+
+{% block content %}
+
+
+    <div class="container">
+
+        <div class="row">
+            <div class="col-sm col-xl col-lg col-md" style="margin-bottom: 2px;">
+                <form class="form-inline">
+
+                    {% if current_theme == "dark" %}
+                        <input class="form-control mr-sm-2 bg-dark border-secondary" type="search" placeholder="Search" style="margin-right: 5px; margin-bottom: 2px;"
+                               aria-label="Search" id="search" onkeypress="filterOnEnter(event)">
+                    {% else %}
+                        <input class="form-control mr-sm-2" type="search" placeholder="Search" aria-label="Search" style="margin-right: 5px; margin-bottom: 2px;"
+                               id="search" onkeypress="filterOnEnter(event)">
+                    {% endif %}
+                    <button form="" autofocus class="btn search-button-color my-2 my-sm-0" onclick="refreshContent()"
+                            id="search_submit" type="submit" style="margin-right: 5px; margin-bottom: 0 !important; margin-top: 0 !important;">Search
+                    </button>
+
+                    <select onchange="refreshContent()" class="form-control" style='margin-left: 0px; width: 100%; max-width: 200px; display: none;' id="research-group-selector"></select>
+
+                </form>
+
+            </div>
+            <div class="col-auto text-right">
+                <button type="button" class="btn search-button-color" id="addButton">
+                    Add
+                </button>
+                <button type="button" class="btn danger-color" id="activationButton">
+                    Deactivate selected
+                </button>
+                <button type="button" class="btn default-color" id="editButton">
+                    Edit selected
+                </button>
+                <button type="button" class="btn default-color" id="selectAllButton">
+                    Select all
+                </button>
+            </div>
+        </div>
+
+        <div class="modal fade" id="modal" tabindex="-1" role="dialog" aria-hidden="true" style="display: none;">
+            <div class="modal-dialog" role="document">
+
+                {% if current_theme == "dark" %}
+                    <div class="modal-content bg-dark">
+                {% else %}
+                    <div class="modal-content">
+                {% endif %}
+
+                <div class="modal-header">
+                    <h5 class="modal-title" id="modal-title"></h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+
+                <div class="modal-body" id="modal-body">
+
+                </div>
+
+                <div class="modal-footer">
+                    <span id="modal-info"></span>
+                    <button type="button" class="btn light-button-color" data-dismiss="modal">Close</button>
+                    <button type="button" class="btn default-color" id="saveChangesButton">Save changes</button>
+                </div>
+
+                </div>
+                </div>
+
+            </div>
+
+            <br>
+
+            <nav class="nav nav-pills nav-fill border border-secondary rounded">
+                <a data-toggle="tab" class="nav-item nav-link active" href="#" onclick="refreshContent(tab.GROUPS)">Research
+                    Groups</a>
+                <a data-toggle="tab" class="nav-item nav-link" href="#" onclick="refreshContent(tab.EMPLOYEES)">Employees</a>
+                <a data-toggle="tab" class="nav-item nav-link" href="#" onclick="refreshContent(tab.TAGS)">Tags</a>
+                <a data-toggle="tab" class="nav-item nav-link" href="#"
+                   onclick="refreshContent(tab.TYPES)">Types</a>
+            </nav>
+
+            <br>
+
+            <div id="empty-content" class="text-center text-secondary" style="margin-top: 30px">
+                <h5>Empty</h5>
+            </div>
+
+            <ul class="list-group" id="content">
+
+            </ul>
+        </div>
+    </div>
+
+{% endblock %}

@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <link rel="shortcut icon" type="image/png" href="{{ url_for('static', filename='favicon.ico') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/lib/bootstrap.min.css') }}" type="text/css">
+
+    <script src="{{ url_for('static', filename='js/lib/jquery-3.3.1.min.js') }}" type="text/javascript"></script>
+    <script src='{{ url_for('static', filename='js/lib/popper.min.js') }}' type="text/javascript" xmlns=""></script>
+    <script src='{{ url_for('static', filename='js/lib/bootstrap.min.js') }}' type="text/javascript"></script>
+    <script src='{{ url_for('static', filename='js/esp.js') }}' type="text/javascript"></script>
+    <script src='{{ url_for('static', filename='js/cookies.js') }}' type="text/javascript"></script>
+
+    <title>{% block title %}{% endblock %} - ESP</title>
+
+    <link rel="stylesheet" type="text/css"
+          href="//cdnjs.cloudflare.com/ajax/libs/cookieconsent2/3.1.0/cookieconsent.min.css"/>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/cookieconsent2/3.1.0/cookieconsent.min.js"></script>
+
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/universal.css') }}" type="text/css">
+
+    {% if current_theme == "light" %}
+        <link rel="stylesheet" href="{{ url_for('static', filename='css/light-theme.css') }}" type="text/css">
+    {% else %}
+        <link rel="stylesheet" href="{{ url_for('static', filename='css/dark-theme.css') }}" type="text/css">
+    {% endif %}
+
+    <script>
+        let GLOBAL = {};
+        GLOBAL.root = {{ request.script_root|tojson|safe }};
+        let name = "{{ current_user.name }}";
+        let role = "{{ current_user.role }}";
+        let userid = "{{ current_user.user_id }}";
+        let language = "{{ current_language }}";
+        let theme = "{{ current_theme }}";
+        let text_notification = "{{ get_text("Cookie notification") }}";
+        let text_allow = "{{ get_text("Cookie allow") }}";
+        let text_deny = "{{ get_text("Cookie deny") }}";
+        let results_lang = "{{ get_text("results") }}"
+    </script>
+
+    {% block head %}
+    {% endblock %}
+
+</head>
+
+<body>
+
+{% if current_theme == "dark" %}
+    {% set background = "bg-dark" %}
+{% endif %}
+
+<div class="page-wrap">
+
+{% include 'nav.html' %}
+
+<div class="modal fade" id="my-profile-modal" tabindex="-1" role="dialog" aria-hidden="true" style="display: none;">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content {{ background }}">
+
+            <div class="modal-header">
+                <h5 class="modal-title" id="my-profile-title"></h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+
+            <div class="modal-body" id="my-profile-body">
+                <div id="my-profile-loading" class="text-center">
+                    <div class="spinner-border" role="status">
+                        <span class="sr-only">{{ get_text("Loading") }}</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="modal-footer">
+                <span id="my-profile-info"></span>
+                <button type="button" class="btn light-button-color" data-dismiss="modal">Close</button>
+                <button type="button" class="btn default-color" id="saveChangesMyProfile">Save changes</button>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+
+<div class="modal fade" id="my-csv-modal" tabindex="-1" role="dialog" aria-hidden="true" style="display: none;">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content {{ background }}">
+
+            <div class="modal-header">
+                <h5 class="modal-title" id="my-csv-title"></h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+
+            <div class="modal-body" id="my-csv-body">
+            </div>
+
+            <div class="modal-footer">
+                <span id="my-profile-info"></span>
+                <button class="btn btn-light" id="download-csv">Download</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<div class="modal fade" id="extension-confirmation-modal"  aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content {{ background }}">
+
+            <div class="modal-header">
+                <h5 class="modal-title" id="extension-confirmation-title"></h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+
+            <div class="modal-body" id="extension-confirmation-body">
+                <p>{{ get_text("Extension confirmation") }}</p>
+            </div>
+
+            <div class="modal-footer">
+                <span id="extension-confirmation-answer"></span>
+                <button type="button" class="btn default-color" onclick="$.returnValues('{{ url_for("projects.notify_extensions") }}')" data-dismiss="modal">{{ get_text("Yes") }}</button>
+                <button type="button" class="btn danger-color" data-dismiss="modal">{{ get_text("No") }}</button>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+{% block content %}
+{% endblock %}
+
+</div>
+
+{% include 'footer.html' %}
+
+</body>
+</html>
