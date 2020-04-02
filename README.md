@@ -46,10 +46,8 @@ Lastly we have the client-side which is Javascript with some JQuery, Bootstrap a
 
 ## Preview
 
-<img src="doc/img/home.png" width="200"/>
-<img src="doc/img/projects.png" width="200"/>
-<img src="doc/img/project.png" width="200"/>
-<img src="doc/img/login.png" width="200"/>
+<img src="doc/img/home.png" width="50%"/><img src="doc/img/projects.png" width="50%"/>
+<img src="doc/img/project.png" width="50%"/><img src="doc/img/login.png" width="50%"/>
 
 
 ## Install
