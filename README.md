@@ -11,12 +11,12 @@ interested.
 
 
 Initially made as a university assignment by
- [MaxVanHoucke](https://github.com/MaxVanHoucke),
- [ThomasVanOnsem](https://github.com/ThomasVanOnsem),
- [ChristophRonken](https://github.com/ChristophRonken) and
- [DanielleJongstra](https://github.com/DJongstra).
+ [Max Van Houcke](https://github.com/MaxVanHoucke),
+ [Thomas Van Onsem](https://github.com/ThomasVanOnsem),
+ [Christoph Ronken](https://github.com/ChristophRonken) and
+ [Danielle Jongstra](https://github.com/DJongstra).
  
- Thanks to [LenFeremans](https://github.com/LFereman) and other faculty staff 
+ Thanks to [Len Feremans](https://github.com/LFereman) and other faculty staff 
  for assisting us throughout this project.
 
 ## Features
