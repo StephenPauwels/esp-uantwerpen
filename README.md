@@ -14,7 +14,7 @@ Initially made as a university assignment by
  [Max Van Houcke](https://github.com/MaxVanHoucke),
  [Thomas Van Onsem](https://github.com/ThomasVanOnsem),
  [Christoph Ronken](https://github.com/ChristophRonken) and
- [Danielle Jongstra](https://github.com/DJongstra).
+ [Daniëlle Jongstra](https://github.com/DJongstra).
  
  Thanks to [Len Feremans](https://github.com/LFereman) and other faculty staff 
  for assisting us throughout this project.
@@ -37,9 +37,9 @@ created for the search functionality of projects.
 Furthermore we have Flask as the main server technology.  
 The *src/controllers* folder contains all the endpoints that serve html templates from the *src/templates* folder
 and also contains helper endpoints that provide necessary functionality such as retrieving all projects etc.  
-The *src/static* folder is served directly as well. It contains all static files such as images, stylesheets and
+The *src/static* folder is served directly. It contains all static files such as images, stylesheets and
 Javascript files.  
-The *src/models* folder is self explanatory and simple contains all the models in the database along with DAO's to access them.
+The *src/models* folder is self explanatory and simply contains all the models in the database along with DAO's to access them.
 The *src/tests* folder contains some scenario tests using Selenium. 
 
 Lastly we have the client-side which is Javascript with some JQuery, Bootstrap and
