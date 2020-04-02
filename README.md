@@ -16,11 +16,13 @@ Initially made as a university assignment by
  [ChristophRonken](https://github.com/ChristophRonken) and
  [DanielleJongstra](https://github.com/DJongstra).
  
+ Thanks to [LenFeremans](https://github.com/LFereman) and other faculty staff 
+ for assisting us throughout this project.
 
 ## Features
 
 - Students can browse the projects, favorite them and express interest
-- Professors can publish project ideas with collaborators,
+- Professors can publish project ideas with collaborators
 - Smart recommendation system that is personal to each student
 - Integration of an existing LDAP system to support login of students and professors
 - Options for dark mode and different languages
