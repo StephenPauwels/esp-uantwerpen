@@ -327,11 +327,11 @@ def get_all_project_data(p_id):
     linked_projects_data = set()
     for link in linked_projects:
         linked_project = project_access.get_project(link.project_2, active_only)
-        if not linked_project.is_active:
-            continue
         if len(linked_projects_data) >= 4:
             break
-        linked_projects_data.add(project_access.get_project(link.project_2, active_only))
+        if not linked_project.is_active:
+            continue
+        linked_projects_data.add(linked_project)
 
     # Fill linked projects list with most viewed projects
     if len(linked_projects_data) < 4:
