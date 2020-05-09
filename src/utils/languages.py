@@ -405,7 +405,7 @@ language_dict = {
         "nl": "Er is geen medewerkerstype geselecteerd."
     },
     "Registration confirmation": {
-        "en": "<strong>Success!</strong> Your registration is send! You will be notified of any changes.",
+        "en": "<strong>Success!</strong> Your registration is sent! You will be notified of any changes.",
         "nl": "<strong>Succes!</strong> De registratie is verzonden! U zal verwittigd worden van eventuele wijzigingen."
     },
     "show full": {

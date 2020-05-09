@@ -98,15 +98,17 @@ def add_registration():
             registration = Registration(current_user.user_id, project_id, "Pending")
             RegistrationDataAccess(get_db()).add_registration(registration)
 
-            project_title = ProjectDataAccess(get_db()).get_project(project_id, False).title
+            project = ProjectDataAccess(get_db()).get_project(project_id, False)
+            if not project.is_active:
+                raise Exception()
 
-            msg = f"You registered for project {project_title}!\n" \
+            msg = f"You registered for project {project.title}!\n" \
                 f"You'll be notified when one of the supervisors changes your registration status.\n" \
                 f"Best of luck!"
 
             send_mail(current_user.user_id + "@ad.ua.ac.be", "ESP Registration", msg)
 
-            msg_employees = f"Student {current_user.name} ({current_user.user_id}) has registered for your project {project_title}.\n" \
+            msg_employees = f"Student {current_user.name} ({current_user.user_id}) has registered for your project {project.title}.\n" \
                 f"To change the registration status please visit the ESP site." \
 
             guides = GuideDataAccess(get_db()).get_guides_for_project(project_id)
@@ -324,6 +326,9 @@ def get_all_project_data(p_id):
     linked_projects = LinkDataAccess(get_db()).get_links_for_project(p_id)
     linked_projects_data = set()
     for link in linked_projects:
+        linked_project = project_access.get_project(link.project_2, active_only)
+        if not linked_project.is_active:
+            continue
         if len(linked_projects_data) >= 4:
             break
         linked_projects_data.add(project_access.get_project(link.project_2, active_only))
