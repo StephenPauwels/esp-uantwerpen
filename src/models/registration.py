@@ -74,13 +74,13 @@ class RegistrationDataAccess:
         :return: A list of project registrations.
         """
         cursor = self.dbconnect.get_cursor()
-        cursor.execute('SELECT student, name FROM project_registration JOIN student '
+        cursor.execute('SELECT student, name, type FROM project_registration JOIN student '
                        'ON project_registration.student = student_id '
                        'WHERE project=%s AND status=%s',
                        (project_id, "Pending"))
         registrations = list()
         for row in cursor:
-            registrations.append({"student": row[0], "name": row[1]})
+            registrations.append({"student": row[0], "name": row[1], "type": row[2]})
         return registrations
 
     def add_registration(self, obj):
@@ -157,7 +157,7 @@ class RegistrationDataAccess:
                        "left join guide G on G.project = PR.project "
                        "left join project P on P.project_id = PR.project "
                        "left join employee E on E.id = G.employee "
-                       "group by PR.status, S.student_id, S.name, P.title")
+                       "group by PR.status, PR.type, S.student_id, S.name, P.title")
         data = list()
         data.append({"student_id": 'student_id',
                      "student_name": 'student_name',
