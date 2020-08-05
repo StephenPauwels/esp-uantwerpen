@@ -810,7 +810,12 @@ function construct_registrations() {
             <tr>
                 <td><a href="mailto:${registration['student_nr']}@ad.ua.ac.be">${registration['name']}</a></td>
                 <td class="text-center">${registration['student_nr']}</td>
-                <td align="right">
+                <td class="type">
+                    <select>
+                        ${project['types'].map(function (type) {return `<option value="${type}">${type}</option>`}).join('')}
+                    </select>
+                </td>
+                <td class="status" align="right">
                     <span id="status"></span>
                     <select>
                         <option value="Pending">Pending</option>
@@ -823,31 +828,36 @@ function construct_registrations() {
         `;
 
         const elem = $(row);
-        elem.find("select").val(registration['status']).on("change", function () {
-            const data = {
-                student_id: registration['student_nr'],
-                project_id: project['project_id'],
-                status: this.value
-            };
-
-            const status = elem.find("#status");
-            status.text("Saving..");
-
-            $.ajax({
-                url: "handle-registration",
-                method: "POST",
-                data: JSON.stringify(data),
-                contentType: 'application/json',
-                success: function () {
-                    status.text("Saved!");
-                },
-                error: function () {
-                    status.text("Error occurred");
-                }
-            });
-        });
+        elem.find('.type select').val(registration['type']).on('change', function () {
+            update_registration(registration, null, this.value)});
+        elem.find(".status select").val(registration['status']).on("change", function () { update_registration(registration, this.value, null) });
         registrations.append(elem);
     }
+}
+
+function update_registration(registration, new_status, new_type) {
+    const data = {
+        student_id: registration['student_nr'],
+        project_id: project['project_id'],
+        status: new_status,
+        type: new_type
+    };
+
+    const status = $("#status");
+    status.text("Saving..");
+
+    $.ajax({
+        url: "handle-registration",
+        method: "POST",
+        data: JSON.stringify(data),
+        contentType: 'application/json',
+        success: function () {
+            status.text("Saved!");
+        },
+        error: function () {
+            status.text("Error occurred");
+        }
+    });
 }
 
 /**

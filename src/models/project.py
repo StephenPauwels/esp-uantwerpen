@@ -173,11 +173,11 @@ class ProjectDataAccess:
         project.employees = guides
 
         """Registrations"""
-        cursor.execute('SELECT student, name, status FROM project_registration JOIN student s on '
+        cursor.execute('SELECT student, name, status, type FROM project_registration JOIN student s on '
                        'project_registration.student = s.student_id WHERE project=%s', (project_id,))
         registrations = list()
         for row in cursor:
-            registrations.append({"student_nr": row[0], "name": row[1], "status": row[2]})
+            registrations.append({"student_nr": row[0], "name": row[1], "status": row[2], "type": row[3]})
         project.registrations = registrations
 
         """Descriptions"""

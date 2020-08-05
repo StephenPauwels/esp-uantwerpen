@@ -138,7 +138,8 @@ def handle_registration():
 
             RegistrationDataAccess(get_db()).update_registration(student_id=data['student_id'],
                                                                  project_id=data['project_id'],
-                                                                 new_status=data['status'])
+                                                                 new_status=data['status'],
+                                                                 new_type=data['type'])
 
             project_title = ProjectDataAccess(get_db()).get_project(data['project_id'], False).title
 

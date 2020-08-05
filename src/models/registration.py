@@ -99,7 +99,7 @@ class RegistrationDataAccess:
             self.dbconnect.rollback()
             raise
 
-    def update_registration(self, student_id, project_id, new_status):
+    def update_registration(self, student_id, project_id, new_status, new_type):
         """
         Updates the status of a registration.
         :param student_id: The student ID for which a registration exists.
@@ -109,10 +109,21 @@ class RegistrationDataAccess:
         """
         cursor = self.dbconnect.get_cursor()
         try:
-            cursor.execute('UPDATE Project_Registration '
-                           'SET status = %s '
-                           'WHERE project=%s AND student=%s',
-                           (new_status, project_id, student_id))
+            if new_status and new_type:
+                cursor.execute('UPDATE Project_Registration '
+                               'SET status = %s, type = %s'
+                               'WHERE project=%s AND student=%s',
+                               (new_status, new_type, project_id, student_id))
+            elif new_status:
+                cursor.execute('UPDATE Project_Registration '
+                               'SET status = %s'
+                               'WHERE project=%s AND student=%s',
+                               (new_status, project_id, student_id))
+            elif new_type:
+                cursor.execute('UPDATE Project_Registration '
+                               'SET type = %s'
+                               'WHERE project=%s AND student=%s',
+                               (new_type, project_id, student_id))
             self.dbconnect.commit()
         except:
             self.dbconnect.rollback()
