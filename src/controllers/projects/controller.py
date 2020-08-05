@@ -95,7 +95,8 @@ def add_registration():
     if current_user.is_authenticated and current_user.role == "student":
         try:
             project_id = request.form['data']
-            registration = Registration(current_user.user_id, project_id, "Pending")
+            type = request.form['type']
+            registration = Registration(current_user.user_id, project_id, type, "Pending")
             RegistrationDataAccess(get_db()).add_registration(registration)
 
             project = ProjectDataAccess(get_db()).get_project(project_id, False)
@@ -120,7 +121,7 @@ def add_registration():
                     send_mail(guide.email, "ESP Registration", msg_employees)
 
             return jsonify({'success': True}), 200, {'ContentType': 'application/json'}
-        except:
+        except Exception as e:
             return jsonify({'success': False, "message": "Failed to add a new registration!"}), 400, {
                 'ContentType': 'application/json'}
 

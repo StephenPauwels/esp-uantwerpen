@@ -610,7 +610,19 @@ function construct_project() {
         document.getElementById("modify-btn").setAttribute("style", "display: true;");
     }
 
+    if (role === 'student') {
+        fill_register_dropdown();
+    }
 }
+
+
+function fill_register_dropdown() {
+    let container = $('#registration-options');
+    for (let type of project['types']) {
+        container.append($(`<a class="dropdown-item" href="#" onclick="register_for_project('${type}')">${type}</a>`))
+    }
+}
+
 
 /**
  * Adds a description to the page.
@@ -753,17 +765,17 @@ function make_rg_popover(popover) {
 
 /**
  * Requests a registration to be made for the project.
- * @param confirmation_text English or Dutch confirmation text.
+ * @param type e.g. Thesis, Research Internship 1,...
  */
-function register_for_project(confirmation_text) {
+function register_for_project(type) {
     $.ajax({
         url: 'add-registration',
         type: 'POST',
-        data: {data: project['project_id']},
+        data: {data: project['project_id'], type: type},
         dataType: 'json',
         success: function () {
             const alert = $(`<div class="alert alert-success alert-dismissible fade show">
-                                ${confirmation_text}
+                                <strong>Success!</strong> Your registration is sent! You will be notified of any changes.
                                 <button type="button" class="close" data-dismiss="alert" aria-label="Close"> <span aria-hidden="true">&times;</span></button>
                             </div>`);
             $("#buttons").append(alert);
