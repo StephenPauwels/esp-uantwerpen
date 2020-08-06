@@ -130,7 +130,7 @@ function get_open_registrations(data, title) {
         //Loop all the registrations of that project
         if (data[i]['registrations'].length > 0) {
             for (let j = 0; j < data[i]['registrations'].length; j++) {
-                base.appendChild(make_notification_item(title, data[i]['registrations'][j]['name'],
+                base.appendChild(make_notification_item(title, data[i]['registrations'][j]['name'] + " (" + data[i]['registrations'][j]['type'] + ")",
                     data[i]["title"], "project-page?project_id=" + data[i]['project_id'],
                     "static/images/registration.svg"));
                 nr_of_notifications += 1;
@@ -190,10 +190,10 @@ function make_notification_item(subject, info, project, link, image_link) {
     //The table exists of only one big row
     let main_row = document.createElement("tr");
     table.appendChild(main_row);
-    //That row is devided into 2 colums: 1 for image
+    //That row is divided into 3 columns: 1 for image
     let main_col1 = document.createElement("tb");
     main_row.appendChild(main_col1);
-    main_col1.setAttribute("class", "col-4");
+    main_col1.setAttribute("class", "col-3");
     //Create dummy row to place the image in de the center row
     let dummy_row = document.createElement("tr");
     main_col1.appendChild(dummy_row);
@@ -212,6 +212,15 @@ function make_notification_item(subject, info, project, link, image_link) {
     ///Project title row
     let content_row3 = document.createElement("tr");
     main_col2.appendChild(content_row3);
+
+    //1 row for the date
+    let main_col3 = document.createElement("tb");
+    main_row.appendChild(main_col3);
+    main_col3.setAttribute("class", "col-1");
+    ///Subject row
+    let date_row1 = document.createElement("tr");
+    main_col3.appendChild(date_row1);
+    date_row1.innerHTML = "16/05";   //TODO dynamic date
 
     //Create the image for the notification and put it in the table
     let image = document.createElement("img");
@@ -473,6 +482,7 @@ function getcsvModal() {
                     csvContent += entry.student_id + "," +
                         entry.student_name + "," +
                         entry.status + "," +
+                        entry.type + "," +
                         entry.title + "," +
                         entry.employee_name + "\n"
                 }
