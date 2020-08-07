@@ -874,6 +874,14 @@ function fillCard(number, project) {
     let badges = $("#card-badges" + number);
     badges.children().remove();
 
+    if (is_occupied(project)) {
+        badges.append($(`
+            <span class="badge badge-danger" style="margin-right: 10px">
+                ${language === 'en' ? 'Occupied' : 'Volzet'}
+            </span>
+        `))
+    }
+
     if (project["is_active"] !== undefined && !project["is_active"]) {
         let inactive_badge = document.createElement("span");
         inactive_badge.setAttribute("class", "badge badge-info");
@@ -1245,21 +1253,24 @@ function filter_full(current_projects) {
     }
 
     let filtered_projects = [];
-    for (let j = 0; j < current_projects.length; j++) {
-
-        let registered_students = 0;
-        for (let i = 0; i < current_projects[j]['registrations'].length; i++) {
-            if (current_projects[j]['registrations'][i]['status'] === "Accepted") {
-                registered_students += 1;
-            }
-        }
-
-        if (current_projects[j]['max_students'] > registered_students) {
-                filtered_projects.push(current_projects[j]);
+    for (let project of current_projects) {
+        if (! is_occupied(project)) {
+            filtered_projects.push(project);
         }
     }
     return filtered_projects;
 }
+
+function is_occupied(project) {
+    let students = 0;
+    for (let registration of project['registrations']) {
+        if (registration['status'] === "Accepted") {
+            students += 1;
+        }
+    }
+    return project['max_students'] <= students
+}
+
 
 /**
  * This function filters projects based on promotor text.
