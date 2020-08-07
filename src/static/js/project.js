@@ -319,7 +319,7 @@ function edit_project() {
         refresh_active_button();
     });
 
-    init_editor("title");
+    $("#title").attr("contenteditable", "true");
     init_editor("description");
 
     $("#badges").html("");
@@ -377,7 +377,7 @@ function edit_project() {
  * @param {boolean} description_warning toggles the description warnings
  */
 function save_project(description_warning=true) {
-    project["title"] =  CKEDITOR.instances["title"].getData();
+    project["title"] =  $('#title').text();
 
     let current_description = CKEDITOR.instances["description"].getData();
 
