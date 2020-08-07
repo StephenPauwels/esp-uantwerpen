@@ -1249,7 +1249,7 @@ function filter_full(current_projects) {
 
         let registered_students = 0;
         for (let i = 0; i < current_projects[j]['registrations'].length; i++) {
-            if (current_projects[j]['registrations'][i]['status'] === "Passed") {
+            if (current_projects[j]['registrations'][i]['status'] === "Accepted") {
                 registered_students += 1;
             }
         }
