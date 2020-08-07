@@ -24,6 +24,7 @@ $(document).ready(function () {
 
     setupButtons();
     setupModal();
+    saveScrollingPosition();
 
     // Set the value of the selector to the value in the URL parameters
     $("#amount-selector").val(getProjectsPerPage() === 1000 ? "All" : getProjectsPerPage());
@@ -32,7 +33,7 @@ $(document).ready(function () {
         $("#search_text").val($.urlParam("search"));
         search();
     } else {
-        refreshProjectsData();
+        refreshProjectsData(restoreScrollingPosition);
     }
 
     $.ajax({
@@ -50,16 +51,38 @@ $(document).ready(function () {
 
 });
 
+
+/**
+ * Save scrolling position
+ */
+function saveScrollingPosition() {
+    var pathName = document.location.pathname;
+    window.onbeforeunload = function () {
+        var scrollPosition = $(document).scrollTop();
+        sessionStorage.setItem("scrollPosition_" + pathName, scrollPosition.toString());
+    };
+}
+
+function restoreScrollingPosition() {
+    var pathName = document.location.pathname;
+    if (sessionStorage["scrollPosition_" + pathName]) {
+        $(document).scrollTop(sessionStorage.getItem("scrollPosition_" + pathName));
+    }
+}
+
 /**
  * This function refreshes all project data and applies filters.
  */
-function refreshProjectsData() {
+function refreshProjectsData(callback=null) {
     // Get all the projects, show them when arrived
     $.ajax({
         url: "get-all-projects-data",
         success: function (result) {
             allProjects = result;
             filterProjects();
+            if (callback) {
+                callback()
+            }
         }
     });
 }
