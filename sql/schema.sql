@@ -139,6 +139,7 @@ CREATE TABLE project_registration
   project       INT                 REFERENCES Project (project_id) ON UPDATE CASCADE ON DELETE CASCADE,
   type          VARCHAR(255)        REFERENCES Type (type_name) ON UPDATE CASCADE ON DELETE CASCADE,
   status        RegistrationStatus  DEFAULT 'Pending',
+  date          date                NOT NULL DEFAULT CURRENT_DATE,
   PRIMARY KEY (student, project)
 );
 
