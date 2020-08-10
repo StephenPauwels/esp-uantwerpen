@@ -24,6 +24,9 @@ body {
     color: cornflowerblue;
 }
 
+a {
+    color: white;
+}
 
 a:hover {
     color: #C8C9CB !important;
