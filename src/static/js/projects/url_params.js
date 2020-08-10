@@ -1,3 +1,13 @@
+function restoreFilters() {
+    let params = getURLParams();
+    if (params.get('available')) {
+        $("#full-filter").prop('checked', params.get('available') === 'true');
+    }
+    if (params.get('employee')) {
+        $("#search_promotor").val(params.get('employee'));
+    }
+}
+
 /**
  * @returns {number} the page, default value 0
  */
@@ -19,7 +29,11 @@ function setPage(number) {
     if (projectsPerPage === 1000) {
         projectsPerPage = "All";
     }
-    window.history.pushState('Projects', "Projects - ESP", GLOBAL.root + `/projects?page=${number}&amount=${projectsPerPage}&edit=${inEditMode()}&search=${getSearch()}`);
+    setParam('page', number);
+    setParam('amount', projectsPerPage);
+    setParam('edit', inEditMode());
+    setParam('search', getSearch());
+    // window.history.pushState('Projects', "Projects - ESP", GLOBAL.root + `/projects?page=${number}&amount=${projectsPerPage}&edit=${inEditMode()}&search=${getSearch()}`);
 }
 
 /**
@@ -35,14 +49,13 @@ function getSearch() {
     }
 }
 
-
-
 /**
  * This function pushes a new page to the browser, based on a search query
  * @param {string} query
  */
 function setSearch(query) {
-    window.history.pushState('Projects', "Projects - ESP", GLOBAL.root + `/projects?page=${getPage()}&amount=${getProjectsPerPage()}&edit=${inEditMode()}&search=${query}`);
+    setParam('search', query);
+    // window.history.pushState('Projects', "Projects - ESP", GLOBAL.root + `/projects?page=${getPage()}&amount=${getProjectsPerPage()}&edit=${inEditMode()}&search=${query}`);
 }
 
 /**
@@ -70,7 +83,8 @@ function setProjectsPerPage(number) {
     if (number === 1000) {
         number = "All";
     }
-    window.history.pushState('Projects', "Projects - ESP", GLOBAL.root + `/projects?page=${getPage()}&amount=${number}&edit=${inEditMode()}&search=${getSearch()}`);
+    setParam('amount', number);
+    // window.history.pushState('Projects', "Projects - ESP", GLOBAL.root + `/projects?page=${getPage()}&amount=${number}&edit=${inEditMode()}&search=${getSearch()}`);
 }
 
 /**
