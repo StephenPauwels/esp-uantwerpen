@@ -20,9 +20,10 @@ body {
     color: white;
 }
 
-a {
-    color: white;
+#description a {
+    color: cornflowerblue;
 }
+
 
 a:hover {
     color: #C8C9CB !important;

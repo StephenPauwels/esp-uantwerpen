@@ -19,9 +19,10 @@ body {
     color: black
 }
 
-a {
-    color: black;
+#description a {
+    color: blue;
 }
+
 
 a:hover {
     color: #C8C9CB !important;
