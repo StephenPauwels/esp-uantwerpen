@@ -15,6 +15,12 @@ function onChangeAvailableProjectsFilter(element) {
 }
 
 
+function onChangeLikedFilter(element) {
+    setParam('liked', element.checked);
+    filterProjects();
+}
+
+
 function onClickFilterPromotor() {
     setParam('employee', $("#search_promotor").val());
     filterProjects();

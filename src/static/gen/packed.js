@@ -337,6 +337,12 @@ function onChangeAvailableProjectsFilter(element) {
 }
 
 
+function onChangeLikedFilter(element) {
+    setParam('liked', element.checked);
+    filterProjects();
+}
+
+
 function onClickFilterPromotor() {
     setParam('employee', $("#search_promotor").val());
     filterProjects();
@@ -1567,6 +1573,9 @@ function restoreFilters() {
     let params = getURLParams();
     if (params.get('available')) {
         $("#full-filter").prop('checked', params.get('available') === 'true');
+    }
+    if (params.get('liked')) {
+        $("#liked-filter").prop('checked', params.get('liked') === 'true');
     }
     if (params.get('employee')) {
         $("#search_promotor").val(params.get('employee'));
