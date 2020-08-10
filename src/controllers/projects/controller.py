@@ -7,7 +7,7 @@ from flask import render_template, Blueprint, request, jsonify, session, current
     send_from_directory
 from src.controllers.projects.manage_projects import manage
 from src.models import TypeDataAccess, ProjectDataAccess, EmployeeDataAccess, ResearchGroupDataAccess, \
-    AcademicYearDataAccess, GuideDataAccess, Like, Registration, RegistrationDataAccess, LikeDataAccess, \
+    GuideDataAccess, Like, Registration, RegistrationDataAccess, LikeDataAccess, \
     LinkDataAccess, ClickDataAccess
 from src.models.db import get_db
 import datetime
@@ -167,28 +167,6 @@ def get_employee_data(name):
     return jsonify(employee.to_dict())
 
 
-@bp.route('/extend_project/<int:p_id>', methods=['POST'])
-def extend_project(p_id):
-    """
-    Handles the POST request to '/extend_project/<int:p_id>'.
-    Attempts to extend project with sent project id.
-    :param p_id: project id
-    :return: Json with success/failure status.
-    """
-    try:
-        dao = ProjectDataAccess(get_db())
-        dao.extend_project(p_id)
-        try:
-            dao.add_active_year(p_id, datetime.datetime.now().year + 1)
-        except:
-            pass
-        return jsonify({'success': True}), 200, {'ContentType': 'application/json'}
-    except Exception as e:
-        print(e)
-        return jsonify({'success': False, "message": "Failed to extend project with id: " + str(p_id) + " !"}), 400, {
-            'ContentType': 'application/json'}
-
-
 @bp.route('/cancel_project_extension/<int:p_id>', methods=['POST'])
 def cancel_project_extension(p_id):
     """
@@ -220,37 +198,6 @@ def employee_authorized_for_project(employee_name, project_id):
 
     project = ProjectDataAccess(get_db()).get_project(project_id, False)
     return employee.research_group == project.research_group
-
-
-@bp.route('/notify-extensions', methods=['GET', 'POST'])
-def notify_extensions():
-    """
-    Handles the GET & POST request to '/notify-extensions'.
-    Marks all projects for extension and adds the next academic year to the database.
-    :return: Json with success/failure status.
-    """
-    try:
-        project_access = ProjectDataAccess(get_db())
-        academic_year_access = AcademicYearDataAccess(get_db())
-        project_access.mark_all_projects_for_extension()
-        try:
-            academic_year_access.add_academic_year(datetime.datetime.now().year + 1)
-        except:
-            pass
-        return jsonify({'success': True}), 200, {'ContentType': 'application/json'}
-    except Exception as e:
-        return jsonify({'success': False, "message": "Failed to extend all projects!"}), 400, {
-            'ContentType': 'application/json'}
-
-
-@bp.route('/enforce-extensions', methods=['POST'])
-def enforce_extensions():
-    try:
-        ProjectDataAccess(get_db()).enforce_extensions()
-        return jsonify({'success': True}), 200, {'ContentType': 'application/json'}
-    except:
-        return jsonify({'success': False, "message": "Failed to enforce extensions"}), 400, {
-            'ContentType': 'application/json'}
 
 
 @bp.route('/project-page')

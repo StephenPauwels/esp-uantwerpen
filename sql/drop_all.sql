@@ -28,8 +28,6 @@ drop table if exists link cascade;
 
 drop table if exists project_has_year cascade;
 
-drop table if exists academic_year cascade;
-
 drop table if exists project_has_tag cascade;
 
 drop table if exists project cascade;

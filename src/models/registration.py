@@ -1,7 +1,8 @@
-from datetime import date
 """@package
 This package enables the project registration usage for the database.
 """
+
+from datetime import date
 
 
 class Registration:

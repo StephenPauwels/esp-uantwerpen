@@ -3,6 +3,7 @@ This package enables the project usage for the database.
 """
 
 import re
+from datetime import date
 from src.models.type import Type
 from src.models import EmployeeDataAccess, GuideDataAccess, LikeDataAccess
 
@@ -26,7 +27,7 @@ class Project:
     """
 
     def __init__(self, project_id, title, max_students, description_id, research_group, is_active, last_updated,
-                 view_count, extension):
+                 view_count, extension, creation_date=date.today().strftime("%Y-%m-%d")):
         """
         Project initializer.
         :param project_id: The project ID.
@@ -49,6 +50,7 @@ class Project:
         self.last_updated = last_updated
         self.view_count = view_count
         self.extension = extension
+        self.creation_date = creation_date
 
         """Data from other tables"""
         self.html_content_eng = None
@@ -58,7 +60,6 @@ class Project:
         self.employees = None
         self.registrations = None
         self.attachments = None
-        self.active_years = None
         self.liked = False
 
     def to_dict(self):
@@ -151,10 +152,10 @@ class ProjectDataAccess:
 
         """Data from project table"""
         cursor.execute('SELECT project_id, title, max_students, description_id, research_group, is_active, '
-                       'last_updated, view_count, extension_needed FROM project'
+                       'last_updated, view_count, extension_needed, creation_date FROM project'
                        ' WHERE project_id=%s', (project_id,))
         row = cursor.fetchone()
-        project = Project(row[0], row[1], row[2], row[3], row[4], row[5], row[6], row[7], row[8])
+        project = Project(row[0], row[1], row[2], row[3], row[4], row[5], row[6], row[7], row[8], row[9])
 
         """Types"""
         types = list()
@@ -194,12 +195,6 @@ class ProjectDataAccess:
             attachments.append({'name': row[0], 'file_location': row[1]})
         project.attachments = attachments
 
-        """Years"""
-        cursor.execute('SELECT year FROM project_has_year WHERE project=%s', (project_id,))
-        years = list()
-        for row in cursor:
-            years.append(row[0])
-        project.active_years = years
         return project
 
     def get_project_types(self, project_id):
@@ -312,7 +307,7 @@ class ProjectDataAccess:
         cursor = self.dbconnect.get_cursor()
         try:
             cursor.execute('INSERT INTO Project(title, max_students, description_id, research_group, '
-                           'is_active, extension_needed) VALUES(%s,%s,%s,%s,%s,%s)',
+                           'is_active, extension_needed, creation_date) VALUES(%s,%s,%s,%s,%s,%s, CURRENT_DATE)',
                            (obj.title, obj.max_students, obj.description_id,
                             obj.research_group, obj.is_active, obj.extension))
             # Get id and return updated object
@@ -358,21 +353,21 @@ class ProjectDataAccess:
             self.dbconnect.rollback()
             raise
 
-    def add_active_year(self, project_id, year):
-        """
-        Links a project with an academic year.
-        :param project_id: The project to link with a year.
-        :param year: The year to link.
-        :raise: Exception if the database has to roll back.
-        """
-        cursor = self.dbconnect.get_cursor()
-        try:
-            cursor.execute('INSERT INTO project_has_year(project, year) VALUES(%s,%s)',
-                           (project_id, year))
-            self.dbconnect.commit()
-        except:
-            self.dbconnect.rollback()
-            raise
+    # def add_active_year(self, project_id, year):
+    #     """
+    #     Links a project with an academic year.
+    #     :param project_id: The project to link with a year.
+    #     :param year: The year to link.
+    #     :raise: Exception if the database has to roll back.
+    #     """
+    #     cursor = self.dbconnect.get_cursor()
+    #     try:
+    #         cursor.execute('INSERT INTO project_has_year(project, year) VALUES(%s,%s)',
+    #                        (project_id, year))
+    #         self.dbconnect.commit()
+    #     except:
+    #         self.dbconnect.rollback()
+    #         raise
 
     def add_project_tag(self, project_id, tag):
         """
@@ -441,32 +436,32 @@ class ProjectDataAccess:
             self.dbconnect.rollback()
             raise
 
-    def mark_all_projects_for_extension(self):
-        """
-        Marks all active projects for extension.
-        :raise: Exception if something went wrong when updating the database.
-        """
-        cursor = self.dbconnect.get_cursor()
-        try:
-            cursor.execute('UPDATE project SET extension_needed = TRUE WHERE is_active = TRUE')
-            self.dbconnect.commit()
-        except:
-            self.dbconnect.rollback()
-            raise
+    # def mark_all_projects_for_extension(self):
+    #     """
+    #     Marks all active projects for extension.
+    #     :raise: Exception if something went wrong when updating the database.
+    #     """
+    #     cursor = self.dbconnect.get_cursor()
+    #     try:
+    #         cursor.execute('UPDATE project SET extension_needed = TRUE WHERE is_active = TRUE')
+    #         self.dbconnect.commit()
+    #     except:
+    #         self.dbconnect.rollback()
+    #         raise
 
-    def extend_project(self, project_id):
-        """
-        Extend a project to the next year.
-        :param project_id: The project to update.
-        :raise: Exception if the database has to roll back.
-        """
-        cursor = self.dbconnect.get_cursor()
-        try:
-            cursor.execute('UPDATE project SET extension_needed = FALSE WHERE project_id=%s', (project_id,))
-            self.dbconnect.commit()
-        except:
-            self.dbconnect.rollback()
-            raise
+    # def extend_project(self, project_id):
+    #     """
+    #     Extend a project to the next year.
+    #     :param project_id: The project to update.
+    #     :raise: Exception if the database has to roll back.
+    #     """
+    #     cursor = self.dbconnect.get_cursor()
+    #     try:
+    #         cursor.execute('UPDATE project SET extension_needed = FALSE WHERE project_id=%s', (project_id,))
+    #         self.dbconnect.commit()
+    #     except:
+    #         self.dbconnect.rollback()
+    #         raise
 
     def remove_tags(self, project_id):  # TODO move to tag file?
         """
@@ -530,30 +525,30 @@ class ProjectDataAccess:
             self.dbconnect.rollback()
             raise
 
-    def delete_project_extension(self, project_id):
-        """
-        Sets a project to inactive and makes it so that an extension is not needed anymore.
-        :param project_id: The project to update.
-        :raise: Exception if the database has to roll back.
-        """
-        cursor = self.dbconnect.get_cursor()
-        try:
-            cursor.execute('UPDATE project SET extension_needed = %s, is_active = FALSE WHERE project_id=%s',
-                           (False, project_id))
-            self.dbconnect.commit()
-        except:
-            self.dbconnect.rollback()
-            raise
+    # def delete_project_extension(self, project_id):
+    #     """
+    #     Sets a project to inactive and makes it so that an extension is not needed anymore.
+    #     :param project_id: The project to update.
+    #     :raise: Exception if the database has to roll back.
+    #     """
+    #     cursor = self.dbconnect.get_cursor()
+    #     try:
+    #         cursor.execute('UPDATE project SET extension_needed = %s, is_active = FALSE WHERE project_id=%s',
+    #                        (False, project_id))
+    #         self.dbconnect.commit()
+    #     except:
+    #         self.dbconnect.rollback()
+    #         raise
 
-    def enforce_extensions(self):
-        """
-        Sets all projects where an extension was needed to inactive
-        :raise: Exception if the database has to roll back.
-        """
-        cursor = self.dbconnect.get_cursor()
-        try:
-            cursor.execute('UPDATE project SET extension_needed = FALSE, is_active = FALSE WHERE extension_needed = TRUE')
-            self.dbconnect.commit()
-        except:
-            self.dbconnect.rollback()
-            raise
+    # def enforce_extensions(self):
+    #     """
+    #     Sets all projects where an extension was needed to inactive
+    #     :raise: Exception if the database has to roll back.
+    #     """
+    #     cursor = self.dbconnect.get_cursor()
+    #     try:
+    #         cursor.execute('UPDATE project SET extension_needed = FALSE, is_active = FALSE WHERE extension_needed = TRUE')
+    #         self.dbconnect.commit()
+    #     except:
+    #         self.dbconnect.rollback()
+    #         raise
