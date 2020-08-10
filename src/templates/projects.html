@@ -92,7 +92,7 @@
                    placeholder="(Co-)Promotor/Mentor" autocomplete="off" list="employees-list"
                    aria-label="Search" id="search_promotor">
 
-            <button class="btn search-button-color w-auto" onclick="filterProjects()"
+            <button class="btn search-button-color w-auto" onclick="onClickFilterPromotor()"
                      type="submit">&#x1F50D</button>
 
         </div>
@@ -101,7 +101,7 @@
 
                 <br>
 
-                <input type="checkbox" id="full-filter" onchange="filterProjects()">
+                <input type="checkbox" id="full-filter" onchange="onChangeAvailableProjectsFilter(this)">
                 <label for="full-filter">Only Available Projects</label>
 
                 {% if current_user.is_authenticated and current_user.role == "student" %}
