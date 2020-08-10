@@ -132,7 +132,7 @@ function get_open_registrations(data, title) {
             for (let j = 0; j < data[i]['registrations'].length; j++) {
                 base.appendChild(make_notification_item(title, data[i]['registrations'][j]['name'] + " (" + data[i]['registrations'][j]['type'] + ")",
                     data[i]["title"], "project-page?project_id=" + data[i]['project_id'],
-                    "static/images/registration.svg"));
+                    "static/images/registration.svg", data[i]['registrations'][j]['date']));
                 nr_of_notifications += 1;
             }
         }
@@ -177,7 +177,7 @@ function get_projects_to_extend(data, title, language) {
  * @param image_link The link for the notification image.
  * @return {HTMLLIElement} List item HTML element.
  */
-function make_notification_item(subject, info, project, link, image_link) {
+function make_notification_item(subject, info, project, link, image_link, date) {
     let item = document.createElement("li");
     //Create the table (notification element)
     let table = document.createElement("table");
@@ -220,7 +220,7 @@ function make_notification_item(subject, info, project, link, image_link) {
     ///Subject row
     let date_row1 = document.createElement("tr");
     main_col3.appendChild(date_row1);
-    date_row1.innerHTML = "16/05";   //TODO dynamic date
+    date_row1.innerHTML = date['day'] + "/" + date['month'];
 
     //Create the image for the notification and put it in the table
     let image = document.createElement("img");
@@ -463,7 +463,7 @@ function getcsvModal() {
     modalBody.html(`
             <div class="row">
                 <div class="col">
-                    Generates a csv file with data for all project registrations on active projects.
+                    Generates a csv file with data for all project registrations on active projects from given academic year.
                 </div>
             </div>            
         `);
@@ -477,20 +477,23 @@ function getcsvModal() {
             dataType: 'json',
             success: function (result) {
                 let csvContent = "data:text/csv;charset=utf-8,";
-
+                let today = new Date();
+                csvContent += "Rapport aangemaakt op " + today.toLocaleDateString() + " voor projecten van academiejaar " + "2020-2021\n\n";  //TODO dynamisch jaar
                 for (const entry of result){
                     csvContent += entry.student_id + "," +
                         entry.student_name + "," +
                         entry.status + "," +
+                        entry.date + "," +
                         entry.type + "," +
                         entry.title + "," +
                         entry.employee_name + "\n"
                 }
 
+
                 let encodedUri = encodeURI(csvContent);
                 let link = document.createElement("a");
                 link.setAttribute("href", encodedUri);
-                link.setAttribute("download", "registrations.csv");
+                link.setAttribute("download", today.toLocaleDateString() + "-registrations.csv");
                 document.body.appendChild(link); // Required for FF
 
                 link.click();
@@ -529,5 +532,13 @@ function timestampToString(stamp) {
 }
 
 
-
-
+function addAllAcademicYears(){
+    $.ajax({
+        url: "/get-all-years",
+        method: "GET",
+        dataType: 'json',
+        success: function (result) {
+            console.log("Succes!")
+        }
+    })
+}

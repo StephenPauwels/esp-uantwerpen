@@ -86,7 +86,7 @@
 </div>
 
 
-<div class="modal fade" id="my-csv-modal" tabindex="-1" role="dialog" aria-hidden="true" style="display: none;">
+<div class="modal fade" id="my-csv-modal" tabindex="-1" role="dialog" aria-hidden="true" style="display: none;" onload="addAllAcademicYears()">
     <div class="modal-dialog" role="document">
         <div class="modal-content {{ background }}">
 
@@ -101,6 +101,12 @@
             </div>
 
             <div class="modal-footer">
+                <div class="dropdown bootstrap-select" style="width: auto;">
+                    <select class="selectpicker w-auto" multiple id="yearSelector">
+                        <option value="2019-2020">2019-2020</option>
+                        <option value="2020-2021">2020-2021</option>
+                    </select>
+                </div>
                 <span id="my-profile-info"></span>
                 <button class="btn btn-light" id="download-csv">Download</button>
             </div>

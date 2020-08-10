@@ -84,7 +84,8 @@ class RegistrationDataAccess:
                        (project_id, "Pending"))
         registrations = list()
         for row in cursor:
-            registrations.append({"student": row[0], "name": row[1], "type": row[2], "date": row[3]})
+            registrations.append({"student": row[0], "name": row[1], "type": row[2],
+                                  "date": {"day": row[3].day, "month": row[3].month, "year": row[3].year}})
         return registrations
 
     def add_registration(self, obj):
@@ -164,20 +165,20 @@ class RegistrationDataAccess:
                        "left join employee E on E.id = G.employee "
                        "group by PR.status, PR.type, PR.date,S.student_id, S.name, P.title")
         data = list()
-        data.append({"student_id": 'student_id',
-                     "student_name": 'student_name',
-                     "type": 'type',
-                     "status": 'status',
-                     "reg_date": 'date',
-                     "title": 'title',
-                     "employee_name": 'employee_name'})
+        data.append({"student_id": 'Student ID',
+                     "student_name": 'Student Name',
+                     "type": 'Type',
+                     "status": 'Status',
+                     "date": 'Last Change',
+                     "title": 'Title',
+                     "employee_name": 'Employee Name(s)'})
 
         for row in cursor:
             data.append({"student_id": row[0],
                          "student_name": row[1],
                          "type": row[2],
                          "status": row[3],
-                         "reg_date": row[4],
+                         "date": str(row[4].day) + "/" + str(row[4].month) + "/" + str(row[4].year),
                          "title": row[5],
                          "employee_name": row[6]})
         return data
