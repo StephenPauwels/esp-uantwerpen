@@ -151,11 +151,19 @@ class RegistrationDataAccess:
             self.dbconnect.rollback()
             raise
 
-    def get_csv_data(self):
+    def get_csv_data(self, years):
         """
         Fetch all data with correct csv data
         :return: {list} data.
         """
+        date_select = 'where '
+        for year in years:
+            split = year.split("-")
+            date_select += 'PR.date >= \'' + split[0] + '-04-01\' AND '
+            date_select += 'PR.date <= \'' + split[1] + '-03-31\' AND '
+        date_select = date_select[:-4]
+        if len(years) == 0:
+            date_select = ""
 
         cursor = self.dbconnect.get_cursor()
         cursor.execute("select S.student_id, S.name, PR.type, PR.status, PR.date, P.title, string_agg(E.name, ' - ' ORDER BY E.name) "
@@ -164,7 +172,8 @@ class RegistrationDataAccess:
                        "left join guide G on G.project = PR.project "
                        "left join project P on P.project_id = PR.project "
                        "left join employee E on E.id = G.employee "
-                       "group by PR.status, PR.type, PR.date,S.student_id, S.name, P.title")
+                       + date_select +
+                       "group by PR.status, PR.type, PR.date,S.student_id, S.name, P.title ")
         data = list()
         data.append({"student_id": 'Student ID',
                      "student_name": 'Student Name',

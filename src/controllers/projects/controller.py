@@ -405,16 +405,17 @@ def update_recommendations(p1_id, p2_id, amount):
         return ""
 
 
-@bp.route('/csv-data', methods=['GET'])
+@bp.route('/csv-data', methods=['POST'])
 def get_csv_data():
     """
-    Handles the GET request to '/csv-data', which retrieves data about all project registrations.
+    Handles the POST request to '/csv-data', which retrieves data about all project registrations for certain years.
     :return: Json with success/failure status / data
     """
+    data = request.json
     if not current_user.is_authenticated or (current_user.role != "admin" and current_user.role != "employee"):
         return jsonify(
             {'success': False, "message": "You are not authorized to access this data"}), 400, {
                    'ContentType': 'application/json'}
     else:
-        data = RegistrationDataAccess(get_db()).get_csv_data()
+        data = RegistrationDataAccess(get_db()).get_csv_data(data)
         return jsonify(data)

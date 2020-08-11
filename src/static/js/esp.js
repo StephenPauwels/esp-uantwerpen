@@ -392,14 +392,16 @@ function getCSVModal() {
     let downloadButton = $("#download-csv");
     downloadButton.off("click");
     downloadButton.click(function () {
+        let years = $('#yearSelector').val();
         $.ajax({
             url: "/csv-data",
-            method: "GET",
-            dataType: 'json',
+            method: "POST",
+            data: JSON.stringify(years),
+            contentType: 'application/json',
             success: function (result) {
                 let csvContent = "data:text/csv;charset=utf-8,";
                 let today = new Date();
-                csvContent += "Rapport aangemaakt op " + today.toLocaleDateString() + " voor projecten van academiejaar " + "2020-2021\n\n";  //TODO dynamisch jaar
+                csvContent += "Rapport aangemaakt op " + today.toLocaleDateString() + " voor projecten van academiejaar(en) " + years.toString() +"\n\n";
                 for (const entry of result){
                     csvContent += entry.student_id + "," +
                         entry.student_name + "," +
