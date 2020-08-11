@@ -442,7 +442,6 @@ function addYears(){
     let options = document.getElementById("yearSelector");
     let today = new Date();
     for(let i = 2019; i<=today.getFullYear(); i++){
-        console.log("in loop");
         let option = document.createElement("option");
         let newYear = i + 1;
         let academicYear = i.toString() + "-" + newYear.toString();
@@ -450,4 +449,5 @@ function addYears(){
         option.value = academicYear;
         options.appendChild(option);
     }
+    $('select').selectpicker();
 }
