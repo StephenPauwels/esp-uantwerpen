@@ -1,5 +1,6 @@
 from flask import Flask, request, session, jsonify, render_template
 from flask_login import LoginManager, current_user
+from flask_assets import Environment, Bundle
 
 from src.controllers.auth import ldap
 from src.config import config_data
@@ -15,7 +16,6 @@ from src.controllers.home import bp as home_blueprint
 from src.controllers.tags import bp as tags_blueprint
 from src.controllers.cookies import bp as cookies_blueprint
 from src.controllers.profile import bp as profile_blueprint
-
 
 app = Flask(__name__)
 app.teardown_appcontext(close_db)
@@ -34,11 +34,18 @@ app.register_blueprint(profile_blueprint)
 login_manager = LoginManager()
 login_manager.init_app(app)
 
+assets = Environment(app)
+assets.register('projects', Bundle('js/projects/edit.js',
+                                   'js/projects/filter.js',
+                                   'js/projects/index.js',
+                                   'js/projects/projects_list.js',
+                                   'js/projects/url_params.js',
+                                   output='gen/packed.js'))
+
 
 # Injects variables and functions, so they can be used in the templates
 @app.context_processor
 def context_processor():
-
     # Function to get the current arguments, used in the templates for urls
     def get_args_string():
         string = "?"

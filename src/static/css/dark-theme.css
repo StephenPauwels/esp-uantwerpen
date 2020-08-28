@@ -20,6 +20,10 @@ body {
     color: white;
 }
 
+#description a {
+    color: cornflowerblue;
+}
+
 a {
     color: white;
 }
