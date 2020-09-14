@@ -19,5 +19,13 @@ def mail():
     return jsonify({'success': True}), 200, {'ContentType': 'application/json'}
 
 
+@bp.route('/admin-mail')
+def admin_mail():
+    return render_template('mails.html')
+
+
+@bp.route('/admin-mail', methods=['POST'])
+def post_admin_mail():
+    data = request.get_json()
 
 
