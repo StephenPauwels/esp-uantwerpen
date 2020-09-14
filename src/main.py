@@ -16,6 +16,7 @@ from src.controllers.home import bp as home_blueprint
 from src.controllers.tags import bp as tags_blueprint
 from src.controllers.cookies import bp as cookies_blueprint
 from src.controllers.profile import bp as profile_blueprint
+from src.controllers.mails import bp as mails_blueprint
 
 app = Flask(__name__)
 app.teardown_appcontext(close_db)
@@ -30,6 +31,7 @@ app.register_blueprint(home_blueprint)
 app.register_blueprint(tags_blueprint)
 app.register_blueprint(cookies_blueprint)
 app.register_blueprint(profile_blueprint)
+app.register_blueprint(mails_blueprint)
 
 login_manager = LoginManager()
 login_manager.init_app(app)
@@ -92,16 +94,6 @@ def load_user(user_id):
     if user_id in extra_admins:
         u.role = 'admin'
     return u
-
-
-@app.route('/mail', methods=['POST'])
-def mail():
-    first_name = request.json["first-name"]
-    last_name = request.json["last-name"]
-    role = request.json["role"]
-    message = request.json["message"]
-    send_contact_message(first_name, last_name, role, message)
-    return jsonify({'success': True}), 200, {'ContentType': 'application/json'}
 
 
 @app.route('/contact')
