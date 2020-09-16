@@ -13,29 +13,64 @@
 
 {% block content %}
 
-<div class="container">
+    <div class="container">
 
-    <h1 class="text-center">Admin Mail</h1>
+        <h1 class="text-center">Admin Mail</h1>
 
-    <i style="color: grey;">Mail content</i>
-    <textarea style="width: 100%; height: 250px">
+        <i style="color: grey;">Onderwerp</i> <br>
+        <input id="subject" type="text"> <br><br>
+
+        <i style="color: grey;">Inhoud (Note: 'Beste {naam}' wordt automatisch voor de inhoud gezet)</i>
+        <textarea id="content" style="width: 100%; height: 250px">
     </textarea>
+        <br>
+        <br>
 
-    <select class="selectpicker w-auto" name="ontvangers" title="Ontvangers">
-        <option value="students">Studenten</option>
-        <option value="employees">Werknemers</option>
-    </select>
+        <select id="receivers" class="selectpicker w-auto" name="ontvangers" title="Ontvangers">
+            <option value="students">Studenten</option>
+            <option value="employees">Werknemers</option>
+        </select>
 
-    <select multiple class="selectpicker w-auto" name="toevoegingen" title="Toevoegingen">
-        <option value="active">Active projects</option>
-        <option value="archived-recent">Archived recent (includes roll over)</option>
-        <option value="archived-old">Archived old</option>
-        <option value="projects-assigned-new">Projects assigned</option>
-        <option value="projects-pending">Projects with pending registrations</option>
-    </select>
+        <select id="additions" multiple class="selectpicker w-auto" name="toevoegingen" title="Toevoegingen">
+            <option value="active">Active projects</option>
+            <option value="archived-recent">Archived recent (includes roll over)</option>
+            <option value="archived-old">Archived old</option>
+            <option value="projects-assigned-new">Projects assigned</option>
+            <option value="projects-pending">Projects with pending registrations</option>
+        </select>
 
-    <button type="button" class="btn btn-primary float-right">Verstuur mail</button>
+        <br>
 
-</div>
+        <button type="button" class="btn btn-primary float-right" onclick="$('#modal').modal('toggle');">Verstuur mail</button>
+
+
+        <div class="modal fade" id="modal" tabindex="-1" role="dialog" aria-hidden="true"
+             style="display: none;">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content {{ background }}">
+
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="my-profile-title"></h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+
+                    <div class="modal-body" id="modal-body">
+                        Zeker dat je de mail wilt versturen?
+                    </div>
+
+                    <div class="modal-footer">
+                        <span id="modal-info"></span>
+                        <button type="button" class="btn light-button-color" data-dismiss="modal">Close</button>
+                        <button type="button" class="btn default-color" onclick="sendAdminMail()">Save changes</button>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+
+
+    </div>
 
 {% endblock %}
