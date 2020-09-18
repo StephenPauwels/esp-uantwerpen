@@ -120,7 +120,7 @@ def project_is_full(project):
 def archived_old(receiver, is_student):
     if is_student:
         return ''
-    projects = GuideDataAccess(get_db()).get_projects_for_employee(receiver.e_id)
+    projects = GuideDataAccess(get_db()).get_projects_for_employee("goethals")
     access = ProjectDataAccess(get_db())
     projects = [access.get_project(x['project_id'], False) for x in projects]
     projects = filter(lambda p: not p.is_active, projects)
@@ -136,15 +136,18 @@ def projects_assigned_new(receiver, is_student):
     if is_student:
         return ''
     projects = GuideDataAccess(get_db()).get_projects_for_employee(receiver.e_id)
-    projects = filter(lambda p: not p.is_active, projects)
+    access = ProjectDataAccess(get_db())
+    projects = [access.get_project(x['project_id'], False) for x in projects]
+    projects = filter(lambda p: p.is_active, projects)
     newly_assigned_projects = []
     for project in projects:
-        newly_assigned_projects += [x == "Accepted" for x in project.registrations]  # TODO and last_change <= 2 months
+        newly_assigned_projects += [x if x['status'] == "Accepted" else None for x in project.registrations]  # TODO and last_change <= 2 months
     if not newly_assigned_projects:
         return ''
     text = "NEWLY ASSIGNED PROJECTS"
     for project in newly_assigned_projects:
-        text += project_link(project)
+        if project:
+            text += project_link(project)
     return text
 
 
@@ -152,13 +155,16 @@ def projects_pending(receiver, is_student):
     if is_student:
         return ''
     projects = GuideDataAccess(get_db()).get_projects_for_employee(receiver.e_id)
-    projects = filter(lambda p: not p.is_active, projects)
-    access = RegistrationDataAccess(get_db())
-    pending_projects = [access.get_pending_registrations(x['project_id']) for x in projects]
+    proj_access = ProjectDataAccess(get_db())
+    projects = [proj_access.get_project(x['project_id'], False) for x in projects]
+    projects = filter(lambda p: p.is_active, projects)
+    reg_access = RegistrationDataAccess(get_db())
+    pending_projects = [x if reg_access.get_pending_registrations(x.project_id) else None for x in projects]
     if not pending_projects:
         return ''
     text = "PROJECTS WITH PENDING REGISTRATIONS"
     for project in pending_projects:
-        text += project_link(project)
+        if project:
+            text += project_link(project)
     return text
 
