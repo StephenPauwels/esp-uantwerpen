@@ -1,7 +1,7 @@
 from flask import Blueprint, request, jsonify, render_template
 from src.utils.mail import send_contact_message, send_mail
 from src.models.db import get_db
-from src.models import EmployeeDataAccess, ProjectDataAccess, StudentDataAccess, GuideDataAccess
+from src.models import EmployeeDataAccess, ProjectDataAccess, StudentDataAccess, GuideDataAccess, RegistrationDataAccess
 
 bp = Blueprint('mails', __name__)
 
@@ -70,7 +70,7 @@ def mail_lists(receiver, is_student, lists: list):
     order_lists(lists)
     text = ''
     for list_type in lists:
-        func = locals()[list_type.replace('-', '_')]
+        func = globals()[list_type.replace('-', '_')]
         text += func(receiver, is_student)
     return text
 
@@ -133,8 +133,32 @@ def archived_old(receiver, is_student):
 
 
 def projects_assigned_new(receiver, is_student):
-    pass
+    if is_student:
+        return ''
+    projects = GuideDataAccess(get_db()).get_projects_for_employee(receiver.e_id)
+    projects = filter(lambda p: not p.is_active, projects)
+    newly_assigned_projects = []
+    for project in projects:
+        newly_assigned_projects += [x == "Accepted" for x in project.registrations]  # TODO and last_change <= 2 months
+    if not newly_assigned_projects:
+        return ''
+    text = "NEWLY ASSIGNED PROJECTS"
+    for project in newly_assigned_projects:
+        text += project_link(project)
+    return text
+
 
 def projects_pending(receiver, is_student):
-    pass
+    if is_student:
+        return ''
+    projects = GuideDataAccess(get_db()).get_projects_for_employee(receiver.e_id)
+    projects = filter(lambda p: not p.is_active, projects)
+    access = RegistrationDataAccess(get_db())
+    pending_projects = [access.get_pending_registrations(x['project_id']) for x in projects]
+    if not pending_projects:
+        return ''
+    text = "PROJECTS WITH PENDING REGISTRATIONS"
+    for project in pending_projects:
+        text += project_link(project)
+    return text
 
