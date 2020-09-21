@@ -124,6 +124,8 @@
                                href="{{ url_for("manage_lists.modify_lists") }}">{{ get_text("Supporting Lists") }}</a>
                             <a class="dropdown-item" href="#"
                                id="extension-confirmation">{{ get_text("Extend Projects") }}</a>
+                            <a class="dropdown-item" href="{{ url_for("mails.admin_mail") }}"
+                               id="extension-confirmation">Admin Mails</a>
                         {% endif %}
                     {% endif %}
 

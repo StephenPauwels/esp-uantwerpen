@@ -41,7 +41,7 @@ def post_admin_mail():
         possible_receivers = EmployeeDataAccess(get_db()).get_employees(False)
 
     for person in possible_receivers:
-        mail_content = f'Beste {person.name}\n\n{content}'
+        mail_content = f'Beste {person.name},\n\n{content}'
         personal_lists = mail_lists(person, is_student, lists)
         mail_content += personal_lists
 
@@ -79,11 +79,11 @@ def active(receiver, is_student):
     if is_student:
         return ''
     projects = GuideDataAccess(get_db()).get_projects_for_employee(receiver.e_id)
-    with ProjectDataAccess(get_db()) as access:
-        projects = [access.get_project(x['project_id'], True) for x in projects]
+    access = ProjectDataAccess(get_db())
+    projects = [access.get_project(x['project_id'], True) for x in projects]
     if not projects:
         return ''
-    text = ''
+    text = '\nACTIVE'
     for project in projects:
         text += project_link(project)
     return text
@@ -97,7 +97,7 @@ def archived_recent(receiver, is_student):
     projects = [access.get_project(x['project_id'], True) for x in projects]
     if not projects:
         return ''
-    text = 'ARCHIVED RECENT'
+    text = '\nARCHIVED RECENT:'
     for project in projects:
         if project_is_full(project):
             access.set_active(project.project_id, False)
@@ -106,7 +106,7 @@ def archived_recent(receiver, is_student):
 
 
 def project_link(project):
-    return f'<a href="https://esp.uantwerpen.be/project-page?project_id={project.project_id}">{project.title}</a>'
+    return f'\n<a href="https://esp.uantwerpen.be/project-page?project_id={project.project_id}">{project.title}</a>'
 
 
 def project_is_full(project):
@@ -120,13 +120,13 @@ def project_is_full(project):
 def archived_old(receiver, is_student):
     if is_student:
         return ''
-    projects = GuideDataAccess(get_db()).get_projects_for_employee("goethals")
+    projects = GuideDataAccess(get_db()).get_projects_for_employee(receiver.e_id)
     access = ProjectDataAccess(get_db())
     projects = [access.get_project(x['project_id'], False) for x in projects]
     projects = filter(lambda p: not p.is_active, projects)
     if not projects:
         return ''
-    text = 'ARCHIVED OLD'
+    text = '\nARCHIVED OLD:'
     for project in projects:
         text += project_link(project)
     return text
@@ -141,13 +141,12 @@ def projects_assigned_new(receiver, is_student):
     projects = filter(lambda p: p.is_active, projects)
     newly_assigned_projects = []
     for project in projects:
-        newly_assigned_projects += [x if x['status'] == "Accepted" else None for x in project.registrations]  # TODO and last_change <= 2 months
+        newly_assigned_projects += [project for x in project.registrations if x['status'] == "Accepted"]  # TODO and last_change <= 2 months
     if not newly_assigned_projects:
         return ''
-    text = "NEWLY ASSIGNED PROJECTS"
+    text = "\nNEWLY ASSIGNED PROJECTS:"
     for project in newly_assigned_projects:
-        if project:
-            text += project_link(project)
+        text += project_link(project)
     return text
 
 
@@ -159,12 +158,11 @@ def projects_pending(receiver, is_student):
     projects = [proj_access.get_project(x['project_id'], False) for x in projects]
     projects = filter(lambda p: p.is_active, projects)
     reg_access = RegistrationDataAccess(get_db())
-    pending_projects = [x if reg_access.get_pending_registrations(x.project_id) else None for x in projects]
+    pending_projects = [x for x in projects if reg_access.get_pending_registrations(x.project_id)]
     if not pending_projects:
         return ''
-    text = "PROJECTS WITH PENDING REGISTRATIONS"
+    text = "\nPROJECTS WITH PENDING REGISTRATIONS:"
     for project in pending_projects:
-        if project:
-            text += project_link(project)
+        text += project_link(project)
     return text
 
