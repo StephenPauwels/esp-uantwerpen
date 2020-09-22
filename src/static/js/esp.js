@@ -37,6 +37,19 @@ $.urlParam = function (name) {
     return decodeURI(results[1]) || 0;
 };
 
+
+function getURLParams() {
+    const queryString = window.location.search;
+    return new URLSearchParams(queryString);
+}
+
+function setParam(key, value) {
+    let params = getURLParams();
+    params.set(key, value);
+    window.history.replaceState({}, '', `${location.pathname}?${params}`);
+}
+
+
 /**
  * This function extends the jQuery functionality with an easy to use get request (which only requires a url parameter).
  * @returns {json} result items requested

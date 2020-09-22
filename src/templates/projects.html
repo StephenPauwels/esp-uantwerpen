@@ -6,7 +6,13 @@
 
 {% block head %}
 
-    <script src='{{ url_for('static', filename='js/projects.js') }}' type="text/javascript" xmlns=""></script>
+    {% assets "projects" %}
+        <script type="text/javascript" src="{{ ASSET_URL }}"></script>
+    {% endassets %}
+
+    <script src="{{ url_for('static', filename='js/lib/bootstrap-select.min.js') }}"></script>
+
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/lib/bootstrap-select.min.css') }}">
 
 {% endblock %}
 
@@ -86,7 +92,7 @@
                    placeholder="(Co-)Promotor/Mentor" autocomplete="off" list="employees-list"
                    aria-label="Search" id="search_promotor">
 
-            <button class="btn search-button-color w-auto" onclick="filterProjects()"
+            <button class="btn search-button-color w-auto" onclick="onClickFilterPromotor()"
                      type="submit">&#x1F50D</button>
 
         </div>
@@ -95,11 +101,11 @@
 
                 <br>
 
-                <input type="checkbox" id="full-filter" onchange="filterProjects()">
+                <input type="checkbox" id="full-filter" onchange="onChangeAvailableProjectsFilter(this)">
                 <label for="full-filter">Only Available Projects</label>
 
                 {% if current_user.is_authenticated and current_user.role == "student" %}
-                    <input type="checkbox" id="liked-filter" onchange="filterProjects()">
+                    <input type="checkbox" id="liked-filter" onchange="onChangeLikedFilter(this)">
                     <label for="liked-filter">Likes</label>
                 {% endif %}
 

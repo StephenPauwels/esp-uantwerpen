@@ -50,6 +50,13 @@
                 <li class="nav-item {{ nav_projects }}">
                     <a class="nav-link" href="{{ url_for("projects.projects") }}">{{ get_text("Projects") }}</a>
                 </li>
+
+                {% if current_user.is_authenticated and current_user.role != "student" %}
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for("projects.projects") + '?employee=' + current_user.name }}">{{ get_text("My Projects") }}</a>
+                    </li>
+                {% endif %}
+
             </ul>
 
             {% if current_user.is_authenticated and current_user.role != "student" %}
@@ -121,9 +128,8 @@
 
                         {% if current_user.role == "admin" %}
                             <a class="dropdown-item"
-                               href="{{ url_for("home.home_editor") }}">{{ get_text("Home Page") }}</a>
-                            <a class="dropdown-item"
                                href="{{ url_for("manage_lists.modify_lists") }}">{{ get_text("Supporting Lists") }}</a>
+                            <a class="dropdown-item" href="{{ url_for("mails.admin_mail") }}" id="extension-confirmation">Admin Mails</a>
                         {% endif %}
                     {% endif %}
 

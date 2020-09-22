@@ -1,5 +1,6 @@
 from flask import Flask, request, session, jsonify, render_template
 from flask_login import LoginManager, current_user
+from flask_assets import Environment, Bundle
 
 from src.controllers.auth import ldap
 from src.config import config_data
@@ -15,7 +16,7 @@ from src.controllers.home import bp as home_blueprint
 from src.controllers.tags import bp as tags_blueprint
 from src.controllers.cookies import bp as cookies_blueprint
 from src.controllers.profile import bp as profile_blueprint
-
+from src.controllers.mails import bp as mails_blueprint
 
 app = Flask(__name__)
 app.teardown_appcontext(close_db)
@@ -30,15 +31,23 @@ app.register_blueprint(home_blueprint)
 app.register_blueprint(tags_blueprint)
 app.register_blueprint(cookies_blueprint)
 app.register_blueprint(profile_blueprint)
+app.register_blueprint(mails_blueprint)
 
 login_manager = LoginManager()
 login_manager.init_app(app)
+
+assets = Environment(app)
+assets.register('projects', Bundle('js/projects/edit.js',
+                                   'js/projects/filter.js',
+                                   'js/projects/index.js',
+                                   'js/projects/projects_list.js',
+                                   'js/projects/url_params.js',
+                                   output='gen/packed.js'))
 
 
 # Injects variables and functions, so they can be used in the templates
 @app.context_processor
 def context_processor():
-
     # Function to get the current arguments, used in the templates for urls
     def get_args_string():
         string = "?"
@@ -80,17 +89,11 @@ def before_request():
 
 @login_manager.user_loader
 def load_user(user_id):
-    return ldap.get_user(user_id)
-
-
-@app.route('/mail', methods=['POST'])
-def mail():
-    first_name = request.json["first-name"]
-    last_name = request.json["last-name"]
-    role = request.json["role"]
-    message = request.json["message"]
-    send_contact_message(first_name, last_name, role, message)
-    return jsonify({'success': True}), 200, {'ContentType': 'application/json'}
+    u = ldap.get_user(user_id)
+    extra_admins = config_data.get('student-admins', [])
+    if user_id in extra_admins:
+        u.role = 'admin'
+    return u
 
 
 @app.route('/contact')

@@ -16,6 +16,10 @@ body {
     font-family: Karla;
 }
 
+.title strong, .card-title strong {
+    font-weight: normal;
+}
+
 
 .tt-suggestion {
     display: block;

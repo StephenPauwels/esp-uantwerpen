@@ -38,13 +38,11 @@ def get_all_list_data():
     all_types = TypeDataAccess(conn).get_types(False)
     all_tags = TagDataAccess(conn).get_tags()
     all_groups = ResearchGroupDataAccess(conn).get_research_groups(False)
-    all_fields = StudyFieldDataAccess(conn).get_study_fields(False)
     all_employees = EmployeeDataAccess(conn).get_employees(False)
 
     result = {
         "types": [obj.to_dict() for obj in all_types],
         "tags": all_tags,
-        "study fields": [obj.to_dict() for obj in all_fields],
         "research groups": [obj.to_dict() for obj in all_groups],
         "employees": [obj.to_dict() for obj in all_employees]
     }

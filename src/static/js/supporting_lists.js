@@ -57,7 +57,6 @@ function refreshData() {
             tags = result["tags"];
             types = result["types"];
             researchGroups = result["research groups"];
-            studyFields = result["study fields"];
             employees = result["employees"];
             for (let emp of employees) {
                 employeeNames.push(emp["name"]);
@@ -80,7 +79,6 @@ function refreshData() {
             employees.sort(getSort("name"));
             researchGroups.sort(getSort("name"));
             types.sort(getSort("type_name"));
-            studyFields.sort(getSort("field_name"));
 
             initGroupSelector();
             refreshContent();
