@@ -331,7 +331,22 @@ function resetSearch() {
 }
 
 
+function onChangeAvailableProjectsFilter(element) {
+    setParam('available', element.checked);
+    filterProjects();
+}
 
+
+function onChangeLikedFilter(element) {
+    setParam('liked', element.checked);
+    filterProjects();
+}
+
+
+function onClickFilterPromotor() {
+    setParam('employee', $("#search_promotor").val());
+    filterProjects();
+}
 
 
 /**
@@ -719,11 +734,20 @@ function init_employee_filter() {
  * This function initializes the research group filter with values.
  */
 function init_research_select() {
-    $("#research-group-filter").html(
+    let elem = $("#research-group-filter");
+    elem.html(
         GROUPS.map(function (group) {
             return `<option value='${group}'>${group}</option>`
-        }).join(""))
-        .on('changed.bs.select', function () {
+        }).join(""));
+
+    let param = getURLParams().get('groups');
+    if (param) {
+        let groups = param.split(',');
+        elem.selectpicker('val', groups);
+    }
+
+    elem.on('changed.bs.select', function() {
+            setParam('groups', $(this).val());
             filterProjects();
         })
         .selectpicker('refresh');
@@ -733,12 +757,20 @@ function init_research_select() {
  * This function initializes the type filter with values.
  */
 function init_type_select() {
-    $("#type-filter")
-        .html(
+    let elem = $("#type-filter");
+    elem.html(
         TYPES.map(function (type) {
             return `<option value='${type}'>${type}</option>`
-        }).join(""))
-        .on('changed.bs.select', function () {
+        }).join(""));
+
+    let param = getURLParams().get('types');
+    if (param) {
+        let types = param.split(',');
+        elem.selectpicker('val', types);
+    }
+
+    elem.on('changed.bs.select', function () {
+            setParam('types', $(this).val());
             filterProjects();
         })
         .selectpicker('refresh');
@@ -962,6 +994,8 @@ $(function () {
     // Set the value of the selector to the value in the URL parameters
     $("#amount-selector").val(getProjectsPerPage() === 1000 ? "All" : getProjectsPerPage());
 
+    restoreFilters();
+
     if ($.urlParam("search")) {
         $("#search_text").val($.urlParam("search"));
         search();
@@ -983,7 +1017,6 @@ $(function () {
     });
 
 });
-
 
 
 /**
@@ -1536,6 +1569,19 @@ function createCard(number) {
 
 
 
+function restoreFilters() {
+    let params = getURLParams();
+    if (params.get('available')) {
+        $("#full-filter").prop('checked', params.get('available') === 'true');
+    }
+    if (params.get('liked')) {
+        $("#liked-filter").prop('checked', params.get('liked') === 'true');
+    }
+    if (params.get('employee')) {
+        $("#search_promotor").val(params.get('employee'));
+    }
+}
+
 /**
  * @returns {number} the page, default value 0
  */
@@ -1557,7 +1603,11 @@ function setPage(number) {
     if (projectsPerPage === 1000) {
         projectsPerPage = "All";
     }
-    window.history.pushState('Projects', "Projects - ESP", GLOBAL.root + `/projects?page=${number}&amount=${projectsPerPage}&edit=${inEditMode()}&search=${getSearch()}`);
+    setParam('page', number);
+    setParam('amount', projectsPerPage);
+    setParam('edit', inEditMode());
+    setParam('search', getSearch());
+    // window.history.pushState('Projects', "Projects - ESP", GLOBAL.root + `/projects?page=${number}&amount=${projectsPerPage}&edit=${inEditMode()}&search=${getSearch()}`);
 }
 
 /**
@@ -1573,14 +1623,13 @@ function getSearch() {
     }
 }
 
-
-
 /**
  * This function pushes a new page to the browser, based on a search query
  * @param {string} query
  */
 function setSearch(query) {
-    window.history.pushState('Projects', "Projects - ESP", GLOBAL.root + `/projects?page=${getPage()}&amount=${getProjectsPerPage()}&edit=${inEditMode()}&search=${query}`);
+    setParam('search', query);
+    // window.history.pushState('Projects', "Projects - ESP", GLOBAL.root + `/projects?page=${getPage()}&amount=${getProjectsPerPage()}&edit=${inEditMode()}&search=${query}`);
 }
 
 /**
@@ -1608,7 +1657,8 @@ function setProjectsPerPage(number) {
     if (number === 1000) {
         number = "All";
     }
-    window.history.pushState('Projects', "Projects - ESP", GLOBAL.root + `/projects?page=${getPage()}&amount=${number}&edit=${inEditMode()}&search=${getSearch()}`);
+    setParam('amount', number);
+    // window.history.pushState('Projects', "Projects - ESP", GLOBAL.root + `/projects?page=${getPage()}&amount=${number}&edit=${inEditMode()}&search=${getSearch()}`);
 }
 
 /**

@@ -9,7 +9,22 @@ function resetSearch() {
 }
 
 
+function onChangeAvailableProjectsFilter(element) {
+    setParam('available', element.checked);
+    filterProjects();
+}
 
+
+function onChangeLikedFilter(element) {
+    setParam('liked', element.checked);
+    filterProjects();
+}
+
+
+function onClickFilterPromotor() {
+    setParam('employee', $("#search_promotor").val());
+    filterProjects();
+}
 
 
 /**
@@ -397,11 +412,20 @@ function init_employee_filter() {
  * This function initializes the research group filter with values.
  */
 function init_research_select() {
-    $("#research-group-filter").html(
+    let elem = $("#research-group-filter");
+    elem.html(
         GROUPS.map(function (group) {
             return `<option value='${group}'>${group}</option>`
-        }).join(""))
-        .on('changed.bs.select', function () {
+        }).join(""));
+
+    let param = getURLParams().get('groups');
+    if (param) {
+        let groups = param.split(',');
+        elem.selectpicker('val', groups);
+    }
+
+    elem.on('changed.bs.select', function() {
+            setParam('groups', $(this).val());
             filterProjects();
         })
         .selectpicker('refresh');
@@ -411,12 +435,20 @@ function init_research_select() {
  * This function initializes the type filter with values.
  */
 function init_type_select() {
-    $("#type-filter")
-        .html(
+    let elem = $("#type-filter");
+    elem.html(
         TYPES.map(function (type) {
             return `<option value='${type}'>${type}</option>`
-        }).join(""))
-        .on('changed.bs.select', function () {
+        }).join(""));
+
+    let param = getURLParams().get('types');
+    if (param) {
+        let types = param.split(',');
+        elem.selectpicker('val', types);
+    }
+
+    elem.on('changed.bs.select', function () {
+            setParam('types', $(this).val());
             filterProjects();
         })
         .selectpicker('refresh');

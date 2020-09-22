@@ -23,6 +23,8 @@ $(function () {
     // Set the value of the selector to the value in the URL parameters
     $("#amount-selector").val(getProjectsPerPage() === 1000 ? "All" : getProjectsPerPage());
 
+    restoreFilters();
+
     if ($.urlParam("search")) {
         $("#search_text").val($.urlParam("search"));
         search();
@@ -44,7 +46,6 @@ $(function () {
     });
 
 });
-
 
 
 /**
