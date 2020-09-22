@@ -16,6 +16,7 @@ import src.controllers.projects.tools
 from src.controllers.projects.recommendations import get_projects_with_recommendations
 from werkzeug.utils import secure_filename
 from src.utils.mail import send_mail
+import xlsxwriter
 
 bp = Blueprint('projects', __name__)
 
@@ -418,4 +419,19 @@ def get_csv_data():
                    'ContentType': 'application/json'}
     else:
         data = RegistrationDataAccess(get_db()).get_csv_data(data)
+
+        workbook = xlsxwriter.Workbook('file-storage/Registrations.xlsx')
+        worksheet = workbook.add_worksheet()
+
+        row = 0
+        for registration in data:
+            worksheet.write(row, 0, registration['student_name'])
+            worksheet.write(row, 1, registration['status'])
+            worksheet.write(row, 2, registration['date'])
+            worksheet.write(row, 3, registration['type'])
+            worksheet.write(row, 4, registration['title'])
+            worksheet.write(row, 5, registration['employee_name'])
+            row += 1
+
+        workbook.close()
         return jsonify(data)
