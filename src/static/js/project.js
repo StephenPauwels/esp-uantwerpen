@@ -610,7 +610,19 @@ function construct_project() {
         document.getElementById("modify-btn").setAttribute("style", "display: true;");
     }
 
+    if (role === 'student') {
+        fill_register_dropdown();
+    }
 }
+
+
+function fill_register_dropdown() {
+    let container = $('#registration-options');
+    for (let type of project['types']) {
+        container.append($(`<a class="dropdown-item" href="#" onclick="register_for_project('${type}')">${type}</a>`))
+    }
+}
+
 
 /**
  * Adds a description to the page.
@@ -753,17 +765,17 @@ function make_rg_popover(popover) {
 
 /**
  * Requests a registration to be made for the project.
- * @param confirmation_text English or Dutch confirmation text.
+ * @param type e.g. Thesis, Research Internship 1,...
  */
-function register_for_project(confirmation_text) {
+function register_for_project(type) {
     $.ajax({
         url: 'add-registration',
         type: 'POST',
-        data: {data: project['project_id']},
+        data: {data: project['project_id'], type: type},
         dataType: 'json',
         success: function () {
             const alert = $(`<div class="alert alert-success alert-dismissible fade show">
-                                ${confirmation_text}
+                                <strong>Success!</strong> Your registration is sent! You will be notified of any changes.
                                 <button type="button" class="close" data-dismiss="alert" aria-label="Close"> <span aria-hidden="true">&times;</span></button>
                             </div>`);
             $("#buttons").append(alert);
@@ -798,7 +810,12 @@ function construct_registrations() {
             <tr>
                 <td><a href="mailto:${registration['student_nr']}@ad.ua.ac.be">${registration['name']}</a></td>
                 <td class="text-center">${registration['student_nr']}</td>
-                <td align="right">
+                <td class="type">
+                    <select>
+                        ${project['types'].map(function (type) {return `<option value="${type}">${type}</option>`}).join('')}
+                    </select>
+                </td>
+                <td class="status" align="right">
                     <span id="status"></span>
                     <select>
                         <option value="Pending">Pending</option>
@@ -811,31 +828,36 @@ function construct_registrations() {
         `;
 
         const elem = $(row);
-        elem.find("select").val(registration['status']).on("change", function () {
-            const data = {
-                student_id: registration['student_nr'],
-                project_id: project['project_id'],
-                status: this.value
-            };
-
-            const status = elem.find("#status");
-            status.text("Saving..");
-
-            $.ajax({
-                url: "handle-registration",
-                method: "POST",
-                data: JSON.stringify(data),
-                contentType: 'application/json',
-                success: function () {
-                    status.text("Saved!");
-                },
-                error: function () {
-                    status.text("Error occurred");
-                }
-            });
-        });
+        elem.find('.type select').val(registration['type']).on('change', function () {
+            update_registration(registration, null, this.value)});
+        elem.find(".status select").val(registration['status']).on("change", function () { update_registration(registration, this.value, null) });
         registrations.append(elem);
     }
+}
+
+function update_registration(registration, new_status, new_type) {
+    const data = {
+        student_id: registration['student_nr'],
+        project_id: project['project_id'],
+        status: new_status,
+        type: new_type
+    };
+
+    const status = $("#status");
+    status.text("Saving..");
+
+    $.ajax({
+        url: "handle-registration",
+        method: "POST",
+        data: JSON.stringify(data),
+        contentType: 'application/json',
+        success: function () {
+            status.text("Saved!");
+        },
+        error: function () {
+            status.text("Error occurred");
+        }
+    });
 }
 
 /**

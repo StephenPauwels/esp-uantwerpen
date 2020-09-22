@@ -88,11 +88,14 @@ class GuideDataAccess:
             'WHERE employee=%s', (row[0],))
         projects = list()
         registration_access = RegistrationDataAccess(self.dbconnect)
+        added_projects = []
         for row in cursor:
-            info = {"project_id": row[0], "title": row[1], "extension": row[2]}
-            info["registrations"] = registration_access.get_pending_registrations(row[0])
-            # TODO hoeveelheid data inperken door check row[1] false en registrations leeg
+            if row[0] in added_projects:
+                continue
+            info = {"project_id": row[0], "title": row[1], "extension": row[2],
+                    "registrations": registration_access.get_pending_registrations(row[0])}
             projects.append(info)
+            added_projects.append(row[0])
         return projects
 
     def get_projects_for_employee(self, employee_id):

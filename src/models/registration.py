@@ -8,7 +8,7 @@ class Registration:
     This class defines the student registration for a project.
     """
 
-    def __init__(self, student_id, project_id, status):
+    def __init__(self, student_id, project_id, reg_type, status):
         """
         Registration initializer.
         :param student_id: Student ID.
@@ -17,6 +17,7 @@ class Registration:
         """
         self.student = student_id
         self.project = project_id
+        self.reg_type = reg_type
         self.status = status
 
     def to_dict(self):
@@ -45,13 +46,13 @@ class RegistrationDataAccess:
         :return: Al list with all the resgitration objects.
         """
         cursor = self.dbconnect.get_cursor()
-        cursor.execute('SELECT student, project, status '
+        cursor.execute('SELECT student, project, type, status '
                        'FROM Project_Registration')
-        project_regsitartion_objects = list()
+        project_registration_objects = list()
         for row in cursor:
-            project_regsitartion_obj = Registration(row[0], row[1], row[2])
-            project_regsitartion_objects.append(project_regsitartion_obj)
-        return project_regsitartion_objects
+            project_registration_obj = Registration(row[0], row[1], row[2], row[3])
+            project_registration_objects.append(project_registration_obj)
+        return project_registration_objects
 
     def get_registration(self, student_id, project_id):  # TODO #2 error for empty fetch
         """
@@ -61,10 +62,10 @@ class RegistrationDataAccess:
         :return: The registration object.
         """
         cursor = self.dbconnect.get_cursor()
-        cursor.execute('SELECT student, project, status FROM Project_Registration '
+        cursor.execute('SELECT student, project, type, status FROM Project_Registration '
                        'WHERE student=%s AND project=%s', (student_id, project_id))
         row = cursor.fetchone()
-        return Registration(row[0], row[1], row[2])
+        return Registration(row[0], row[1], row[2], row[3])
 
     def get_pending_registrations(self, project_id):  # TODO #2 error for empty fetch
         """
@@ -73,13 +74,13 @@ class RegistrationDataAccess:
         :return: A list of project registrations.
         """
         cursor = self.dbconnect.get_cursor()
-        cursor.execute('SELECT student, name FROM project_registration JOIN student '
+        cursor.execute('SELECT student, name, type FROM project_registration JOIN student '
                        'ON project_registration.student = student_id '
                        'WHERE project=%s AND status=%s',
                        (project_id, "Pending"))
         registrations = list()
         for row in cursor:
-            registrations.append({"student": row[0], "name": row[1]})
+            registrations.append({"student": row[0], "name": row[1], "type": row[2]})
         return registrations
 
     def add_registration(self, obj):
@@ -90,15 +91,15 @@ class RegistrationDataAccess:
         """
         cursor = self.dbconnect.get_cursor()
         try:
-            cursor.execute('INSERT INTO Project_Registration(student, project, status) '
-                           'VALUES(%s,%s,%s)',
-                           (obj.student, obj.project, obj.status))
+            cursor.execute('INSERT INTO Project_Registration(student, project, type, status) '
+                           'VALUES(%s,%s,%s,%s)',
+                           (obj.student, obj.project, obj.reg_type, obj.status))
             self.dbconnect.commit()
         except:
             self.dbconnect.rollback()
             raise
 
-    def update_registration(self, student_id, project_id, new_status):
+    def update_registration(self, student_id, project_id, new_status, new_type):
         """
         Updates the status of a registration.
         :param student_id: The student ID for which a registration exists.
@@ -108,10 +109,21 @@ class RegistrationDataAccess:
         """
         cursor = self.dbconnect.get_cursor()
         try:
-            cursor.execute('UPDATE Project_Registration '
-                           'SET status = %s '
-                           'WHERE project=%s AND student=%s',
-                           (new_status, project_id, student_id))
+            if new_status and new_type:
+                cursor.execute('UPDATE Project_Registration '
+                               'SET status = %s, type = %s'
+                               'WHERE project=%s AND student=%s',
+                               (new_status, new_type, project_id, student_id))
+            elif new_status:
+                cursor.execute('UPDATE Project_Registration '
+                               'SET status = %s'
+                               'WHERE project=%s AND student=%s',
+                               (new_status, project_id, student_id))
+            elif new_type:
+                cursor.execute('UPDATE Project_Registration '
+                               'SET type = %s'
+                               'WHERE project=%s AND student=%s',
+                               (new_type, project_id, student_id))
             self.dbconnect.commit()
         except:
             self.dbconnect.rollback()
@@ -139,16 +151,17 @@ class RegistrationDataAccess:
         """
 
         cursor = self.dbconnect.get_cursor()
-        cursor.execute("select S.student_id, S.name, PR.status, P.title, string_agg(E.name, ' - ' ORDER BY E.name) "
+        cursor.execute("select S.student_id, S.name, PR.type, PR.status, P.title, string_agg(E.name, ' - ' ORDER BY E.name) "
                        "from project_registration PR "
                        "left join student S on S.student_id = PR.student "
                        "left join guide G on G.project = PR.project "
                        "left join project P on P.project_id = PR.project "
                        "left join employee E on E.id = G.employee "
-                       "group by PR.status, S.student_id, S.name, P.title")
+                       "group by PR.status, PR.type, S.student_id, S.name, P.title")
         data = list()
         data.append({"student_id": 'student_id',
                      "student_name": 'student_name',
+                     "type": 'type',
                      "status": 'status',
                      "title": 'title',
                      "employee_name": 'employee_name'})
@@ -156,7 +169,8 @@ class RegistrationDataAccess:
         for row in cursor:
             data.append({"student_id": row[0],
                          "student_name": row[1],
-                         "status": row[2],
-                         "title": row[3],
-                         "employee_name": row[4]})
+                         "type": row[2],
+                         "status": row[3],
+                         "title": row[4],
+                         "employee_name": row[5]})
         return data

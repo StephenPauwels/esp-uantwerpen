@@ -86,14 +86,6 @@ CREATE TABLE student
   student_id VARCHAR(8) PRIMARY KEY
 );
 
-CREATE TABLE project_registration
-(
-  student VARCHAR(8) REFERENCES Student (student_id) ON UPDATE CASCADE ON DELETE CASCADE,
-  project INT REFERENCES Project (project_id) ON UPDATE CASCADE ON DELETE CASCADE,
-  status  RegistrationStatus DEFAULT 'Pending',
-  PRIMARY KEY (student, project)
-);
-
 CREATE TABLE "like"
 (
   student VARCHAR(8) REFERENCES Student (student_id) ON UPDATE CASCADE ON DELETE CASCADE,
@@ -139,6 +131,15 @@ CREATE TABLE project_has_type
   project INT REFERENCES Project (project_id) ON UPDATE CASCADE ON DELETE CASCADE,
   type    VARCHAR(255) REFERENCES Type (type_name) ON UPDATE CASCADE ON DELETE CASCADE,
   PRIMARY KEY (project, type)
+);
+
+CREATE TABLE project_registration
+(
+  student       VARCHAR(8)          REFERENCES Student (student_id) ON UPDATE CASCADE ON DELETE CASCADE,
+  project       INT                 REFERENCES Project (project_id) ON UPDATE CASCADE ON DELETE CASCADE,
+  type          VARCHAR(255)        REFERENCES Type (type_name) ON UPDATE CASCADE ON DELETE CASCADE,
+  status        RegistrationStatus  DEFAULT 'Pending',
+  PRIMARY KEY (student, project)
 );
 
 CREATE TABLE link
