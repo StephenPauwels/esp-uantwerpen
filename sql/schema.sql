@@ -67,7 +67,8 @@ CREATE TABLE project
   is_active        BOOLEAN NOT NULL,
   last_updated     TIMESTAMP DEFAULT NOW(),
   view_count       INT       DEFAULT 0,
-  extension_needed BOOLEAN   DEFAULT FALSE
+  extension_needed BOOLEAN   DEFAULT FALSE,
+  creation_date    date      NOT NULL DEFAULT CURRENT_DATE
 );
 
 CREATE TABLE guide
@@ -139,6 +140,7 @@ CREATE TABLE project_registration
   project       INT                 REFERENCES Project (project_id) ON UPDATE CASCADE ON DELETE CASCADE,
   type          VARCHAR(255)        REFERENCES Type (type_name) ON UPDATE CASCADE ON DELETE CASCADE,
   status        RegistrationStatus  DEFAULT 'Pending',
+  date          date                NOT NULL DEFAULT CURRENT_DATE,
   PRIMARY KEY (student, project)
 );
 
@@ -148,18 +150,6 @@ CREATE TABLE link
   project_2     INT REFERENCES Project (project_id) ON UPDATE CASCADE ON DELETE CASCADE,
   match_percent FLOAT NOT NULL CHECK ( match_percent <= 1 ),
   PRIMARY KEY (project_1, project_2)
-);
-
-CREATE TABLE academic_year
-(
-  year INT PRIMARY KEY CHECK (year >= 2000)
-);
-
-CREATE TABLE project_has_year
-(
-  project INT REFERENCES Project (project_id) ON UPDATE CASCADE ON DELETE CASCADE,
-  year    INT REFERENCES Academic_Year (year) ON UPDATE CASCADE ON DELETE CASCADE,
-  PRIMARY KEY (project, year)
 );
 
 CREATE TABLE tag
