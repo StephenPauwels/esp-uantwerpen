@@ -123,7 +123,7 @@ def archived_old(receiver, is_student):
     projects = GuideDataAccess(get_db()).get_projects_for_employee(receiver.e_id)
     access = ProjectDataAccess(get_db())
     projects = [access.get_project(x['project_id'], False) for x in projects]
-    projects = filter(lambda p: not p.is_active, projects)
+    projects = [project for project in projects if not project.is_active]
     if not projects:
         return ''
     text = '\nARCHIVED OLD:'
