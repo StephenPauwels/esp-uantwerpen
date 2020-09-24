@@ -406,38 +406,7 @@ function getCSVModal() {
     downloadButton.off("click");
     downloadButton.click(function () {
         let years = $('#yearSelector').val();
-        $.ajax({
-            url: "/csv-data",
-            method: "POST",
-            data: JSON.stringify(years),
-            contentType: 'application/json',
-            success: function (result) {
-                let csvContent = "data:text/csv;charset=utf-8,";
-                let today = new Date();
-                csvContent += "Rapport aangemaakt op " + today.toLocaleDateString() + " voor projecten van academiejaar(en) " + years.toString() +"\n\n";
-                for (const entry of result){
-                    csvContent += entry.student_id + "," +
-                        entry.student_name + "," +
-                        entry.status + "," +
-                        entry.date + "," +
-                        entry.type + "," +
-                        entry.title + "," +
-                        entry.employee_name + "\n"
-                }
-
-
-                let encodedUri = encodeURI(csvContent);
-                let link = document.createElement("a");
-                link.setAttribute("href", encodedUri);
-                link.setAttribute("download", today.toLocaleDateString() + "-registrations.csv");
-                document.body.appendChild(link); // Required for FF
-
-                link.click();
-            },
-            error: function (message) {
-                alert("failed");
-            }
-        });
+        window.location = '/csv-data?years=' + years.join('+');
     });
 }
 

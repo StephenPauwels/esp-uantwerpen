@@ -4,7 +4,7 @@ This package processes all routing requests.
 
 from flask_login import current_user
 from flask import render_template, Blueprint, request, jsonify, session, current_app, \
-    send_from_directory
+    send_from_directory, send_file
 from src.controllers.projects.manage_projects import manage
 from src.models import TypeDataAccess, ProjectDataAccess, EmployeeDataAccess, ResearchGroupDataAccess, \
     GuideDataAccess, Like, Registration, RegistrationDataAccess, LikeDataAccess, \
@@ -16,6 +16,7 @@ import src.controllers.projects.tools
 from src.controllers.projects.recommendations import get_projects_with_recommendations
 from werkzeug.utils import secure_filename
 from src.utils.mail import send_mail
+from src.config import config_data
 import xlsxwriter
 
 bp = Blueprint('projects', __name__)
@@ -406,21 +407,22 @@ def update_recommendations(p1_id, p2_id, amount):
         return ""
 
 
-@bp.route('/csv-data', methods=['POST'])
+@bp.route('/csv-data')
 def get_csv_data():
     """
     Handles the POST request to '/csv-data', which retrieves data about all project registrations for certain years.
     :return: Json with success/failure status / data
     """
-    data = request.json
+    years = request.args['years']
+    years = years.split()
     if not current_user.is_authenticated or (current_user.role != "admin" and current_user.role != "employee"):
-        return jsonify(
-            {'success': False, "message": "You are not authorized to access this data"}), 400, {
-                   'ContentType': 'application/json'}
-    else:
-        data = RegistrationDataAccess(get_db()).get_csv_data(data)
+        return '<div class="title">Er ging iets mis bij het genereren van de pdf</div>'
 
-        workbook = xlsxwriter.Workbook('file-storage/Registrations.xlsx')
+    else:
+        data = RegistrationDataAccess(get_db()).get_csv_data(years)
+
+        file = os.path.join(config_data['file-storage'], 'Registrations.xlsx')
+        workbook = xlsxwriter.Workbook(file)
         worksheet = workbook.add_worksheet()
 
         row = 0
@@ -434,4 +436,6 @@ def get_csv_data():
             row += 1
 
         workbook.close()
-        return jsonify(data)
+
+        return send_file(file, attachment_filename="Registrations.xlsx", as_attachment=True)
+
