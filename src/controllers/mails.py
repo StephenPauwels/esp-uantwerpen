@@ -83,7 +83,7 @@ def active(receiver, is_student):
     projects = [access.get_project(x['project_id'], True) for x in projects]
     if not projects:
         return ''
-    text = '\nACTIVE'
+    text = '\n\nACTIVE'
     for project in projects:
         text += project_link(project)
     return text
@@ -97,7 +97,7 @@ def archived_recent(receiver, is_student):
     projects = [access.get_project(x['project_id'], True) for x in projects]
     if not projects:
         return ''
-    text = '\nARCHIVED RECENT:'
+    text = '\n\nARCHIVED RECENT:'
     for project in projects:
         if project_is_full(project):
             access.set_active(project.project_id, False)
@@ -126,7 +126,7 @@ def archived_old(receiver, is_student):
     projects = [project for project in projects if not project.is_active]
     if not projects:
         return ''
-    text = '\nARCHIVED OLD:'
+    text = '\n\nARCHIVED OLD:'
     for project in projects:
         text += project_link(project)
     return text
@@ -144,7 +144,7 @@ def projects_assigned_new(receiver, is_student):
         newly_assigned_projects += [project for x in project.registrations if x['status'] == "Accepted"]  # TODO and last_change <= 2 months
     if not newly_assigned_projects:
         return ''
-    text = "\nNEWLY ASSIGNED PROJECTS:"
+    text = "\n\nNEWLY ASSIGNED PROJECTS:"
     for project in newly_assigned_projects:
         text += project_link(project)
     return text
@@ -161,7 +161,7 @@ def projects_pending(receiver, is_student):
     pending_projects = [x for x in projects if reg_access.get_pending_registrations(x.project_id)]
     if not pending_projects:
         return ''
-    text = "\nPROJECTS WITH PENDING REGISTRATIONS:"
+    text = "\n\nPROJECTS WITH PENDING REGISTRATIONS:"
     for project in pending_projects:
         text += project_link(project)
     return text

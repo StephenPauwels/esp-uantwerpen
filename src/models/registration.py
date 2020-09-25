@@ -159,8 +159,8 @@ class RegistrationDataAccess:
         date_select = 'where '
         for year in years:
             split = year.split("-")
-            date_select += 'PR.date >= \'' + split[0] + '-04-01\' AND '
-            date_select += 'PR.date <= \'' + split[1] + '-03-31\' AND '
+            date_select += '(PR.date >= \'' + split[0] + '-04-01\' AND '
+            date_select += 'PR.date <= \'' + split[1] + '-03-31\') OR '
         date_select = date_select[:-4]
         if len(years) == 0:
             date_select = ""

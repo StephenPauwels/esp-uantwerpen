@@ -17,6 +17,7 @@ function sendAdminMail() {
         data: JSON.stringify(data),
         contentType: 'application/json',
         success: function (message) {
+            $("#modal").modal("hide");
         },
         error: function (message) {
             $("#modal-info").text("Error occurred: " + message["responseJSON"]["message"])
