@@ -2,6 +2,7 @@ from flask import Blueprint, request, jsonify, render_template
 from src.utils.mail import send_contact_message, send_mail
 from src.models.db import get_db
 from src.models import EmployeeDataAccess, ProjectDataAccess, StudentDataAccess, GuideDataAccess, RegistrationDataAccess
+import datetime
 
 bp = Blueprint('mails', __name__)
 
@@ -133,17 +134,22 @@ def archived_old(receiver, is_student):
 
 
 def projects_assigned_new(receiver, is_student):
-    if is_student:
-        return ''
-    projects = GuideDataAccess(get_db()).get_projects_for_employee(receiver.e_id)
     access = ProjectDataAccess(get_db())
-    projects = [access.get_project(x['project_id'], False) for x in projects]
+    if is_student:
+        projects = access.get_project_ids(active_only=True)
+        projects = [access.get_project(x, False) for x in projects]
+    else:
+        projects = GuideDataAccess(get_db()).get_projects_for_employee(receiver.e_id)
+        projects = [access.get_project(x['project_id'], False) for x in projects]
     projects = filter(lambda p: p.is_active, projects)
     newly_assigned_projects = []
     for project in projects:
-        newly_assigned_projects += [project for x in project.registrations if x['status'] == "Accepted"]  # TODO and last_change <= 2 months
+        newly_assigned_projects += [project for x in project.registrations if x['status'] == "Accepted"
+                                    and x['last_updated'].month >= datetime.datetime.now().month - 2
+                                    and x['last_updated'].year == datetime.datetime.now().year]
     if not newly_assigned_projects:
         return ''
+    newly_assigned_projects = list(dict.fromkeys(newly_assigned_projects))
     text = "\n\nNEWLY ASSIGNED PROJECTS:"
     for project in newly_assigned_projects:
         text += project_link(project)
