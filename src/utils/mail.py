@@ -17,8 +17,13 @@ def send_mail(address, subject, message):
     :return: process return code
     """
     try:
-        cmd = ['sendemail', '-f', 'noreply@uantwerpen.be', '-t', address, '-u', subject, '-m', message, '-s',
-               'smtp.uantwerpen.be']
+        cmd = ['sendemail',
+               '-f', 'noreply@uantwerpen.be',
+               '-t', address,
+               '-u', subject,
+               '-o', 'message-content-type=html',
+               '-m', message,
+               '-s', 'smtp.uantwerpen.be']
         proc = subprocess.Popen(cmd)
         return proc.returncode == 0
     except:
