@@ -1,9 +1,10 @@
 import subprocess
+from src.config import config_data
 
 
 def send_contact_message(first_name, last_name, role, message):
     subject = first_name + " " + last_name + " sent a message from ESP"
-    send_mail("admin@uantwerpen.be", subject, message)
+    send_mail(config_data.get('contact-mail', 'max.vanhoucke@student.uantwerpen.be'), subject, message)
 
 
 def send_mail(address, subject, message):

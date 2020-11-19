@@ -44,7 +44,7 @@ def get_guides_project_info(e_name):
 
 
 def get_random_picture_location():
-    current_directory = os.path.dirname(os.path.abspath(__file__))
+    current_directory = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
     picture_directory = os.path.join(current_directory, "static/images/avatars/png/")
 
     directory = "static/images/avatars/png/"

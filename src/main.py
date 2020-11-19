@@ -5,7 +5,6 @@ from flask_assets import Environment, Bundle
 from src.controllers.auth import ldap
 from src.config import config_data
 from src.utils.languages import languages, get_text
-from src.utils.mail import send_contact_message
 from src.models.db import close_db
 
 # Blueprints
@@ -60,7 +59,8 @@ def context_processor():
             "current_theme": session['theme'],
             "current_language": session['lang'],
             "get_text": lambda key, lang=session['lang']: get_text(key, lang),
-            "archive_active": session['archive']
+            "archive_active": session['archive'],
+            "contact_mail": config_data.get('contact-mail', 'max.vanhoucke@student.uantwerpen.be')
             }
 
 

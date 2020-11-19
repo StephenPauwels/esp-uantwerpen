@@ -1,6 +1,7 @@
 from flask import Blueprint, request, jsonify, render_template
 from src.utils.mail import send_contact_message, send_mail
 from src.models.db import get_db
+from flask_login import current_user
 from src.models import EmployeeDataAccess, ProjectDataAccess, StudentDataAccess, GuideDataAccess, RegistrationDataAccess
 import datetime
 
@@ -22,13 +23,10 @@ def mail():
     return jsonify({'success': True}), 200, {'ContentType': 'application/json'}
 
 
-@bp.route('/admin-mail')
-def view_admin_mail():
-    return render_template('mails.html')
-
-
 @bp.route('/admin-mail', methods=['POST'])
 def post_admin_mail():
+    if not current_user.is_authenticated or current_user.role != 'admin':
+        return jsonify({'success': False}), 400, {'ContentType': 'application/json'}
     data = request.get_json()
     subject = data['subject']
     content = data['content']
@@ -51,7 +49,8 @@ def post_admin_mail():
             continue
 
         receiver_mail = person.student_id + "@ad.ua.ac.be" if is_student else person.email
-        send_mail(receiver_mail, subject, mail_content)
+        print(receiver_mail, ' ', subject, ' ', mail_content)
+        # send_mail(receiver_mail, subject, mail_content)
 
     return jsonify({'success': True}), 200, {'ContentType': 'application/json'}
 
