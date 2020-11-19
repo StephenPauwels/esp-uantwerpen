@@ -95,13 +95,18 @@ def archived_recent(receiver, is_student):
     projects = GuideDataAccess(get_db()).get_projects_for_employee(receiver.e_id)
     access = ProjectDataAccess(get_db())
     projects = [access.get_project(x['project_id'], True) for x in projects]
+    projects = [x for x in projects if x.is_active]
     if not projects:
         return ''
     text = '\n\nARCHIVED RECENT:'
+    roll_over_performed = False
     for project in projects:
         if project_is_full(project):
             access.set_active(project.project_id, False)
             text += project_link(project)
+            roll_over_performed = True
+    if not roll_over_performed:
+        return ''
     return text
 
 
