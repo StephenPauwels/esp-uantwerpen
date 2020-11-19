@@ -10,7 +10,7 @@ from src.models import TypeDataAccess, ProjectDataAccess, EmployeeDataAccess, Re
     GuideDataAccess, Like, Registration, RegistrationDataAccess, LikeDataAccess, \
     LinkDataAccess, ClickDataAccess
 from src.models.db import get_db
-import datetime
+from datetime import datetime
 import os
 import src.controllers.projects.tools
 from src.controllers.projects.recommendations import get_projects_with_recommendations
@@ -436,5 +436,6 @@ def get_csv_data():
 
         workbook.close()
 
-        return send_file(file, attachment_filename="Registrations.xlsx", as_attachment=True)
+        filename = 'Registrations_' + datetime.today().strftime('%d-%m-%Y') + '.xlsx'
+        return send_file(file, attachment_filename=filename, as_attachment=True)
 
