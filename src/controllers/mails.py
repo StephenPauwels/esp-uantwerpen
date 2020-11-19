@@ -50,7 +50,8 @@ def post_admin_mail():
 
         receiver_mail = person.student_id + "@ad.ua.ac.be" if is_student else person.email
         if receiver_mail is not None:
-            send_mail(receiver_mail, subject, mail_content)
+            # send_mail(receiver_mail, subject, mail_content)
+            print('Mail sent to ' + str(receiver_mail) + ' with content ' + str(mail_content))
 
     return jsonify({'success': True}), 200, {'ContentType': 'application/json'}
 
@@ -147,18 +148,18 @@ def projects_assigned_new(receiver, is_student):
             registration = reg_access.get_registration(receiver.student_id, x)
             if registration:
                 project_ids.append(registration.project)
-        projects = [access.get_project(x, False) for x in project_ids]
+        newly_assigned_projects = [access.get_project(x, False) for x in project_ids]
         text = "\n\nNEWLY REGISTERED PROJECTS:"
     else:
         projects = GuideDataAccess(get_db()).get_projects_for_employee(receiver.e_id)
         projects = [access.get_project(x['project_id'], False) for x in projects]
         text = "\n\nNEWLY ASSIGNED PROJECTS:"
-    projects = filter(lambda p: p.is_active, projects)
-    newly_assigned_projects = []
-    for project in projects:
-        newly_assigned_projects += [project for x in project.registrations if x['status'] == "Accepted"
-                                    and x['last_updated'].month >= datetime.datetime.now().month - 2
-                                    and x['last_updated'].year == datetime.datetime.now().year]
+        projects = filter(lambda p: p.is_active, projects)
+        newly_assigned_projects = []
+        for project in projects:
+            newly_assigned_projects += [project for x in project.registrations if x['status'] == "Accepted"
+                                        and x['last_updated'].month >= datetime.datetime.now().month - 2
+                                        and x['last_updated'].year == datetime.datetime.now().year]
     if not newly_assigned_projects:
         return ''
     newly_assigned_projects = list(dict.fromkeys(newly_assigned_projects))
