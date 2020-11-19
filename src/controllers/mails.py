@@ -49,7 +49,8 @@ def post_admin_mail():
             continue
 
         receiver_mail = person.student_id + "@ad.ua.ac.be" if is_student else person.email
-        send_mail(receiver_mail, subject, mail_content)
+        if receiver_mail is not None:
+            send_mail(receiver_mail, subject, mail_content)
 
     return jsonify({'success': True}), 200, {'ContentType': 'application/json'}
 
