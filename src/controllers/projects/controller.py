@@ -413,12 +413,11 @@ def get_csv_data():
     Handles the POST request to '/csv-data', which retrieves data about all project registrations for certain years.
     :return: Json with success/failure status / data
     """
-    years = request.args['years']
-    years = years.split()
     if not current_user.is_authenticated or (current_user.role != "admin" and current_user.role != "employee"):
-        return '<div class="title">Er ging iets mis bij het genereren van de pdf</div>'
-
+        return '<div class="title">Er ging iets mis bij het genereren van het rapport</div>'
     else:
+        years = request.args['years']
+        years = years.split()
         data = RegistrationDataAccess(get_db()).get_csv_data(years)
 
         file = os.path.join(config_data['file-storage'], 'Registrations.xlsx')
