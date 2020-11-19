@@ -7,3 +7,5 @@ add column date date NOT NULL DEFAULT CURRENT_DATE;
 alter table project
 add column creation_date date NOT NULL DEFAULT CURRENT_DATE ;
 
+drop table if exists project_has_year ;
+drop table if exists academic_year ;
