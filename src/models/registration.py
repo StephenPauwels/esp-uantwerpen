@@ -70,6 +70,8 @@ class RegistrationDataAccess:
         cursor.execute('SELECT student, project, type, status, date FROM Project_Registration '
                        'WHERE student=%s AND project=%s', (student_id, project_id))
         row = cursor.fetchone()
+        if not row:
+            return None
         return Registration(row[0], row[1], row[2], row[3], row[4])
 
     def get_pending_registrations(self, project_id):  # TODO #2 error for empty fetch

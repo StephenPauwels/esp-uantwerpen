@@ -140,11 +140,19 @@ def archived_old(receiver, is_student):
 def projects_assigned_new(receiver, is_student):
     access = ProjectDataAccess(get_db())
     if is_student:
-        projects = access.get_project_ids(active_only=True)
-        projects = [access.get_project(x, False) for x in projects]
+        reg_access = RegistrationDataAccess(get_db())
+        all_projects = access.get_project_ids(active_only=True)
+        project_ids = []
+        for x in all_projects:
+            registration = reg_access.get_registration(receiver.student_id, x)
+            if registration:
+                project_ids.append(registration.project)
+        projects = [access.get_project(x, False) for x in project_ids]
+        text = "\n\nNEWLY REGISTERED PROJECTS:"
     else:
         projects = GuideDataAccess(get_db()).get_projects_for_employee(receiver.e_id)
         projects = [access.get_project(x['project_id'], False) for x in projects]
+        text = "\n\nNEWLY ASSIGNED PROJECTS:"
     projects = filter(lambda p: p.is_active, projects)
     newly_assigned_projects = []
     for project in projects:
@@ -154,7 +162,6 @@ def projects_assigned_new(receiver, is_student):
     if not newly_assigned_projects:
         return ''
     newly_assigned_projects = list(dict.fromkeys(newly_assigned_projects))
-    text = "\n\nNEWLY ASSIGNED PROJECTS:"
     for project in newly_assigned_projects:
         text += project_link(project)
     return text
