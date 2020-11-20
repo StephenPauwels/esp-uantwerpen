@@ -39,6 +39,7 @@ def post_admin_mail():
     else:
         possible_receivers = EmployeeDataAccess(get_db()).get_employees(False)
 
+    sent = 0
     for person in possible_receivers:
         mail_content = f'Beste {person.name},\n\n{content}'
         personal_lists = mail_lists(person, is_student, lists)
@@ -51,8 +52,9 @@ def post_admin_mail():
         receiver_mail = person.student_id + "@ad.ua.ac.be" if is_student else person.email
         if receiver_mail is not None:
             send_mail(receiver_mail, subject, mail_content)
+            sent += 1
 
-    return jsonify({'success': True}), 200, {'ContentType': 'application/json'}
+    return jsonify({'success': True, 'sent': sent}), 200, {'ContentType': 'application/json'}
 
 
 def order_lists(lists):

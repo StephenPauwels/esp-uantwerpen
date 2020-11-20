@@ -11,6 +11,7 @@ function sendAdminMail() {
         additions: $("#additions").selectpicker("val")
     };
 
+    $("#modal-info").text("Loading..")
     $.ajax({
         url: "admin-mail",
         method: "POST",
@@ -18,6 +19,8 @@ function sendAdminMail() {
         contentType: 'application/json',
         success: function (message) {
             $("#modal").modal("hide");
+            $("#modal-info").text("")
+            alert(`${message.sent} mails sent`);
         },
         error: function (message) {
             $("#modal-info").text("Error occurred: " + message["responseJSON"]["message"])
