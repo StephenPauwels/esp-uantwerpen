@@ -379,6 +379,9 @@ function edit_project() {
  */
 function type_still_active(types){
     let active_types = [];
+    if(!project['registrations']){
+        return []
+    }
     for (const registration of project['registrations']){
         if(!types.includes(registration['type'])){
             active_types.push(registration['type']);
