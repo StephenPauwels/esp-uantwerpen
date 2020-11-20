@@ -144,10 +144,10 @@ def handle_registration():
                                                                  new_type=data['type'])
 
             project_title = ProjectDataAccess(get_db()).get_project(data['project_id'], False).title
-
-            msg = f"Your registration for project {project_title} has changed to {data['status']}.\n" \
-                f"For questions or remarks please contact the supervisors of the project."
-            send_mail(data['student_id'] + "@ad.ua.ac.be", "ESP Registration Update", msg)
+            if data['status']:
+                msg = f"Your registration for project {project_title} has changed to {data['status']}.\n" \
+                    f"For questions or remarks please contact the supervisors of the project."
+                send_mail(data['student_id'] + "@ad.ua.ac.be", "ESP Registration Update", msg)
         except:
             return jsonify({'success': False, "message": "Failed to update registration!"}), 400, {
                 'ContentType': 'application/json'}
