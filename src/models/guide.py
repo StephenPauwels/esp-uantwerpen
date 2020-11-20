@@ -105,7 +105,7 @@ class GuideDataAccess:
         :return: A list of project ID's
         """
         cursor = self.dbconnect.get_cursor()
-        cursor.execute('SELECT project FROM guide WHERE employee = %s', (employee_id,))
+        cursor.execute('SELECT DISTINCT project FROM guide WHERE employee = %s', (employee_id,))
         project_objects = list()
         for row in cursor:
             project_objects.append({"project_id": row[0]})
