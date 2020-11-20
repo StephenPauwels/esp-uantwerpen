@@ -50,8 +50,7 @@ def post_admin_mail():
 
         receiver_mail = person.student_id + "@ad.ua.ac.be" if is_student else person.email
         if receiver_mail is not None:
-            # send_mail(receiver_mail, subject, mail_content)
-            print('Mail sent to ' + str(receiver_mail) + ' with content ' + str(mail_content))
+            send_mail(receiver_mail, subject, mail_content)
 
     return jsonify({'success': True}), 200, {'ContentType': 'application/json'}
 
@@ -147,9 +146,10 @@ def projects_assigned_new(receiver, is_student):
         for x in all_projects:
             registration = reg_access.get_registration(receiver.student_id, x)
             if registration:
-                project_ids.append(registration.project)
+                if registration.reg_date.year >= datetime.datetime.now().year - 1:
+                    project_ids.append(registration.project)
         newly_assigned_projects = [access.get_project(x, False) for x in project_ids]
-        text = "\n\nNEWLY REGISTERED PROJECTS:"
+        text = "\n\nREGISTERED PROJECTS FOR THIS YEAR AND LAST YEAR:"
     else:
         projects = GuideDataAccess(get_db()).get_projects_for_employee(receiver.e_id)
         projects = [access.get_project(x['project_id'], False) for x in projects]

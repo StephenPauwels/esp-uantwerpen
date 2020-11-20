@@ -373,10 +373,27 @@ function edit_project() {
 }
 
 /**
+ * Check whether the removed types are still used.
+ * @param types The new chosen types.
+ * @returns {array} The removed types that are still used.
+ */
+function type_still_active(types){
+    let active_types = [];
+    for (const registration of project['registrations']){
+        if(!types.includes(registration['type'])){
+            active_types.push(registration['type']);
+        }
+    }
+    return active_types;
+}
+
+
+/**
  * This function provides functionality to save the modified content to the database.
  * @param {boolean} description_warning toggles the description warnings
+ * @param {boolean} type_warning toggles the project type warning
  */
-function save_project(description_warning=true) {
+function save_project(description_warning=true, type_warning=true) {
     project["title"] =  $('#title').text();
 
     let current_description = CKEDITOR.instances["description"].getData();
@@ -431,6 +448,27 @@ function save_project(description_warning=true) {
 
     if (!project['types'].length) {
         $("#error").show().text("Pick at least one type");
+        return;
+    }
+
+    let active_types = type_still_active(project['types']);
+    if(active_types.length > 0 && type_warning){
+        console.log("in ")
+        let err_text;
+        if(active_types.length === 1){
+            err_text = 'Type: \"' + active_types.join() + '\" is still used by a registration. The registration type for those registrations need to be changed by you. Are you sure you want to continue?'
+        }
+        else {
+            err_text = 'Types: ' + active_types.join() + '  are still used by a registration. The registration types for those registrations need to be changed by you. Are you sure you want to continue?'
+        }
+        const confirm_button = $(`<button class="btn btn-outline-success ml-2">Yes</button>`)
+            .click(function () {
+                save_project(description_warning, false)});
+
+        $("#error")
+            .show()
+            .text(err_text)
+            .append(confirm_button);
         return;
     }
 
