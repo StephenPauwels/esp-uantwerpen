@@ -102,7 +102,8 @@ config_data = {
     'dbpass': '',
     'dbhost': '',
     'secret-key': '',
-    'file-storage': ''
+    'file-storage': '',
+    'contact-mail': ''
 }
 ```
 
@@ -120,6 +121,8 @@ python3 -c 'import os; print(os.urandom(16))'
 
 The *file-storage* has to be an absolute path where the user will be able to upload files to.
 Additionally, *file-storage*/home should be a directory with the documents for the home page.
+
+The *contact-mail* will be the address that people will be able to contact for problems/
 
 
 ### Initialize tables

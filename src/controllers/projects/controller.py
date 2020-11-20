@@ -4,18 +4,20 @@ This package processes all routing requests.
 
 from flask_login import current_user
 from flask import render_template, Blueprint, request, jsonify, session, current_app, \
-    send_from_directory
+    send_from_directory, send_file
 from src.controllers.projects.manage_projects import manage
 from src.models import TypeDataAccess, ProjectDataAccess, EmployeeDataAccess, ResearchGroupDataAccess, \
-    AcademicYearDataAccess, GuideDataAccess, Like, Registration, RegistrationDataAccess, LikeDataAccess, \
+    GuideDataAccess, Like, Registration, RegistrationDataAccess, LikeDataAccess, \
     LinkDataAccess, ClickDataAccess
 from src.models.db import get_db
-import datetime
+from datetime import datetime
 import os
 import src.controllers.projects.tools
 from src.controllers.projects.recommendations import get_projects_with_recommendations
 from werkzeug.utils import secure_filename
 from src.utils.mail import send_mail
+from src.config import config_data
+import xlsxwriter
 
 bp = Blueprint('projects', __name__)
 
@@ -95,7 +97,8 @@ def add_registration():
     if current_user.is_authenticated and current_user.role == "student":
         try:
             project_id = request.form['data']
-            registration = Registration(current_user.user_id, project_id, "Pending")
+            type = request.form['type']
+            registration = Registration(current_user.user_id, project_id, type, "Pending")
             RegistrationDataAccess(get_db()).add_registration(registration)
 
             project = ProjectDataAccess(get_db()).get_project(project_id, False)
@@ -120,7 +123,7 @@ def add_registration():
                     send_mail(guide.email, "ESP Registration", msg_employees)
 
             return jsonify({'success': True}), 200, {'ContentType': 'application/json'}
-        except:
+        except Exception as e:
             return jsonify({'success': False, "message": "Failed to add a new registration!"}), 400, {
                 'ContentType': 'application/json'}
 
@@ -137,13 +140,14 @@ def handle_registration():
 
             RegistrationDataAccess(get_db()).update_registration(student_id=data['student_id'],
                                                                  project_id=data['project_id'],
-                                                                 new_status=data['status'])
+                                                                 new_status=data['status'],
+                                                                 new_type=data['type'])
 
             project_title = ProjectDataAccess(get_db()).get_project(data['project_id'], False).title
-
-            msg = f"Your registration for project {project_title} has changed to {data['status']}.\n" \
-                f"For questions or remarks please contact the supervisors of the project."
-            send_mail(data['student_id'] + "@ad.ua.ac.be", "ESP Registration Update", msg)
+            if data['status']:
+                msg = f"Your registration for project {project_title} has changed to {data['status']}.\n" \
+                    f"For questions or remarks please contact the supervisors of the project."
+                send_mail(data['student_id'] + "@ad.ua.ac.be", "ESP Registration Update", msg)
         except:
             return jsonify({'success': False, "message": "Failed to update registration!"}), 400, {
                 'ContentType': 'application/json'}
@@ -163,28 +167,6 @@ def get_employee_data(name):
     """
     employee = EmployeeDataAccess(get_db()).get_employee_by_name(name)
     return jsonify(employee.to_dict())
-
-
-@bp.route('/extend_project/<int:p_id>', methods=['POST'])
-def extend_project(p_id):
-    """
-    Handles the POST request to '/extend_project/<int:p_id>'.
-    Attempts to extend project with sent project id.
-    :param p_id: project id
-    :return: Json with success/failure status.
-    """
-    try:
-        dao = ProjectDataAccess(get_db())
-        dao.extend_project(p_id)
-        try:
-            dao.add_active_year(p_id, datetime.datetime.now().year + 1)
-        except:
-            pass
-        return jsonify({'success': True}), 200, {'ContentType': 'application/json'}
-    except Exception as e:
-        print(e)
-        return jsonify({'success': False, "message": "Failed to extend project with id: " + str(p_id) + " !"}), 400, {
-            'ContentType': 'application/json'}
 
 
 @bp.route('/cancel_project_extension/<int:p_id>', methods=['POST'])
@@ -218,37 +200,6 @@ def employee_authorized_for_project(employee_name, project_id):
 
     project = ProjectDataAccess(get_db()).get_project(project_id, False)
     return employee.research_group == project.research_group
-
-
-@bp.route('/notify-extensions', methods=['GET', 'POST'])
-def notify_extensions():
-    """
-    Handles the GET & POST request to '/notify-extensions'.
-    Marks all projects for extension and adds the next academic year to the database.
-    :return: Json with success/failure status.
-    """
-    try:
-        project_access = ProjectDataAccess(get_db())
-        academic_year_access = AcademicYearDataAccess(get_db())
-        project_access.mark_all_projects_for_extension()
-        try:
-            academic_year_access.add_academic_year(datetime.datetime.now().year + 1)
-        except:
-            pass
-        return jsonify({'success': True}), 200, {'ContentType': 'application/json'}
-    except Exception as e:
-        return jsonify({'success': False, "message": "Failed to extend all projects!"}), 400, {
-            'ContentType': 'application/json'}
-
-
-@bp.route('/enforce-extensions', methods=['POST'])
-def enforce_extensions():
-    try:
-        ProjectDataAccess(get_db()).enforce_extensions()
-        return jsonify({'success': True}), 200, {'ContentType': 'application/json'}
-    except:
-        return jsonify({'success': False, "message": "Failed to enforce extensions"}), 400, {
-            'ContentType': 'application/json'}
 
 
 @bp.route('/project-page')
@@ -456,16 +407,35 @@ def update_recommendations(p1_id, p2_id, amount):
         return ""
 
 
-@bp.route('/csv-data', methods=['GET'])
+@bp.route('/csv-data')
 def get_csv_data():
     """
-    Handles the GET request to '/csv-data', which retrieves data about all project registrations.
+    Handles the POST request to '/csv-data', which retrieves data about all project registrations for certain years.
     :return: Json with success/failure status / data
     """
     if not current_user.is_authenticated or (current_user.role != "admin" and current_user.role != "employee"):
-        return jsonify(
-            {'success': False, "message": "You are not authorized to access this data"}), 400, {
-                   'ContentType': 'application/json'}
+        return '<div class="title">Er ging iets mis bij het genereren van het rapport</div>'
     else:
-        data = RegistrationDataAccess(get_db()).get_csv_data()
-        return jsonify(data)
+        years = request.args['years']
+        years = years.split()
+        data = RegistrationDataAccess(get_db()).get_csv_data(years)
+
+        file = os.path.join(config_data['file-storage'], 'Registrations.xlsx')
+        workbook = xlsxwriter.Workbook(file)
+        worksheet = workbook.add_worksheet()
+
+        row = 0
+        for registration in data:
+            worksheet.write(row, 0, registration['student_name'])
+            worksheet.write(row, 1, registration['status'])
+            worksheet.write(row, 2, registration['date'])
+            worksheet.write(row, 3, registration['type'])
+            worksheet.write(row, 4, registration['title'])
+            worksheet.write(row, 5, registration['employee_name'])
+            row += 1
+
+        workbook.close()
+
+        filename = 'Registrations_' + datetime.today().strftime('%d-%m-%Y') + '.xlsx'
+        return send_file(file, attachment_filename=filename, as_attachment=True)
+

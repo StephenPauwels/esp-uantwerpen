@@ -8,12 +8,10 @@
     <script src='{{ url_for('static', filename='js/project.js') }}'></script>
     <script src="{{ url_for('static', filename='js/lib/ckeditor/ckeditor.js') }}"></script>
     <script src="{{ url_for('static', filename='js/lib/bootstrap-tagsinput.js') }}"></script>
-    <script src="{{ url_for('static', filename='js/lib/bootstrap-select.min.js') }}"></script>
     <script src="{{ url_for('static', filename='js/lib/bootstrap3-typeahead.min.js') }}"></script>
     <script src="{{ url_for('static', filename='js/lib/bootstrap4-toggle.min.js') }}"></script>
 
     <link rel="stylesheet" href="{{ url_for('static', filename='css/lib/bootstrap-tagsinput.css') }}">
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/lib/bootstrap-select.min.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/lib/bootstrap4-toggle.min.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/lib/dropzone.css') }}">
 
@@ -55,8 +53,13 @@
         <div class="text-center" id="buttons">
 
             {% if current_user.is_authenticated and current_user.role == "student" %}
-                <button type="button" class="btn default-color" id="registration-btn"
-                        onclick="register_for_project('{{ get_text("Registration confirmation") }}')">{{ get_text("Register") }}</button>
+                <div class="dropdown">
+                  <button class="btn default-color dropdown-toggle" type="button" id="registration-btn" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    {{ get_text("Register") }}
+                  </button>
+                  <div class="dropdown-menu" aria-labelledby="registration-btn" id="registration-options">
+                  </div>
+                </div>
                 <button type="button" class="btn default-color" id="like-btn"
                         onclick="change_like('{{ get_text("Like") }}', '{{ get_text("Unlike") }}')"></button>
             {% endif %}

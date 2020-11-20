@@ -37,6 +37,19 @@ $.urlParam = function (name) {
     return decodeURI(results[1]) || 0;
 };
 
+
+function getURLParams() {
+    const queryString = window.location.search;
+    return new URLSearchParams(queryString);
+}
+
+function setParam(key, value) {
+    let params = getURLParams();
+    params.set(key, value);
+    window.history.replaceState({}, '', `${location.pathname}?${params}`);
+}
+
+
 /**
  * This function extends the jQuery functionality with an easy to use get request (which only requires a url parameter).
  * @returns {json} result items requested
@@ -84,12 +97,13 @@ $(document).ready(function ($) {
     });
 
     $("#my-csv").click(function () {
-        getcsvModal();
+        getCSVModal();
+        addYears();
     });
 
-    $("#extension-confirmation").click(function () {
+/*    $("#extension-confirmation").click(function () {
         $("#extension-confirmation-modal").modal("toggle");
-    })
+    })*/
 });
 
 /**
@@ -103,7 +117,6 @@ function notifications(user, registration_title, extension_title, language) {
     let data = $.getValues("get-guides-project-info/" + user);
     let notification_count = 0;
     notification_count += get_open_registrations(data, registration_title);
-    notification_count += get_projects_to_extend(data, extension_title, language);
     let badge = document.getElementById("notification-count");
     if (notification_count > 0) {
         badge.innerHTML = "" + notification_count;
@@ -130,9 +143,9 @@ function get_open_registrations(data, title) {
         //Loop all the registrations of that project
         if (data[i]['registrations'].length > 0) {
             for (let j = 0; j < data[i]['registrations'].length; j++) {
-                base.appendChild(make_notification_item(title, data[i]['registrations'][j]['name'],
+                base.appendChild(make_notification_item(title, data[i]['registrations'][j]['name'] + " (" + data[i]['registrations'][j]['type'] + ")",
                     data[i]["title"], "project-page?project_id=" + data[i]['project_id'],
-                    "static/images/registration.svg"));
+                    "static/images/registration.svg", data[i]['registrations'][j]['date']));
                 nr_of_notifications += 1;
             }
         }
@@ -140,33 +153,6 @@ function get_open_registrations(data, title) {
     return nr_of_notifications;
 }
 
-/**
- * Collects and constructs all the notifications of projects that need to be extended to the next year.
- * @param {array} data The open projects.
- * @param {string} title The title for the notification
- * @param {string} language Current language.
- * @return {number} The number of notifications constructed.
- */
-function get_projects_to_extend(data, title, language) {
-    let nr_of_notifications = 0;
-    let base = document.getElementById("notifications");
-    let current_year = new Date().getFullYear();
-    let next = current_year + 1;
-    for (let i = 0; i < data.length; i++) {
-        if (data[i]['extension']) {
-            let item = make_notification_item(title, current_year + "-" + next, data[i]['title'],
-                "#registration_modal" + data[i]['project_id'], "static/images/calendar.svg");
-            item.setAttribute("data-toggle", "modal");
-            item.setAttribute("data-target", "#registration_modal" + data[i]['project_id']);
-            base.appendChild(item);
-            nr_of_notifications += 1;
-
-            document.getElementById("extension-modal").innerHTML += construct_extension_modal(
-                data[i]['project_id'], data[i]['title'], language);
-        }
-    }
-    return nr_of_notifications;
-}
 
 /**
  * Makes a notification item.
@@ -175,9 +161,10 @@ function get_projects_to_extend(data, title, language) {
  * @param project The project the notification is referring to.
  * @param link The link when clicking on the notification.
  * @param image_link The link for the notification image.
+ * @param date Date of the notification.
  * @return {HTMLLIElement} List item HTML element.
  */
-function make_notification_item(subject, info, project, link, image_link) {
+function make_notification_item(subject, info, project, link, image_link, date) {
     let item = document.createElement("li");
     //Create the table (notification element)
     let table = document.createElement("table");
@@ -190,10 +177,10 @@ function make_notification_item(subject, info, project, link, image_link) {
     //The table exists of only one big row
     let main_row = document.createElement("tr");
     table.appendChild(main_row);
-    //That row is devided into 2 colums: 1 for image
+    //That row is divided into 3 columns: 1 for image
     let main_col1 = document.createElement("tb");
     main_row.appendChild(main_col1);
-    main_col1.setAttribute("class", "col-4");
+    main_col1.setAttribute("class", "col-3");
     //Create dummy row to place the image in de the center row
     let dummy_row = document.createElement("tr");
     main_col1.appendChild(dummy_row);
@@ -213,6 +200,15 @@ function make_notification_item(subject, info, project, link, image_link) {
     let content_row3 = document.createElement("tr");
     main_col2.appendChild(content_row3);
 
+    //1 row for the date
+    let main_col3 = document.createElement("tb");
+    main_row.appendChild(main_col3);
+    main_col3.setAttribute("class", "col-1");
+    ///Subject row
+    let date_row1 = document.createElement("tr");
+    main_col3.appendChild(date_row1);
+    date_row1.innerHTML = date['day'] + "/" + date['month'];
+
     //Create the image for the notification and put it in the table
     let image = document.createElement("img");
     image_row.appendChild(image);
@@ -226,59 +222,6 @@ function make_notification_item(subject, info, project, link, image_link) {
     content_row3.innerHTML = "<tb><i>" + project.substring(0, 30) + "...</i></tb>";
 
     return item;
-}
-
-/**
- * Constructs the extension modal.
- * @param project_id The project ID
- * @param title Title of the project.
- * @param language Current language.
- * @returns {string}
- */
-function construct_extension_modal(project_id, title, language) {
-    let modal_title = "";
-    let modal_text1 = "";
-    let modal_text2 = "";
-    let yes = "";
-    let no = "";
-    let close = "";
-    if (language === 'nl') {
-        modal_title = "Project verlenging nodig";
-        modal_text1 = "Wilt u het project ";
-        modal_text2 = " verlengen naar volgend jaar?";
-        yes = "Ja";
-        no = "Nee";
-        close = "Sluit";
-    } else if (language === 'en') {
-        modal_title = "Project extension needed";
-        modal_text1 = "Do you want to extend ";
-        modal_text2 = " to the next year?";
-        yes = "Yes";
-        no = "No";
-        close = "Close";
-    }
-    return '<div class="modal fade" id="registration_modal' + project_id + '" role="dialog">\n' +
-        '     <div class="modal-dialog">\n' +
-        '        <!-- Modal content-->\n' +
-        '        <div class="modal-content">\n' +
-        '            <div class="modal-header">\n' +
-        '                <h4 class="modal-title">' + modal_title + '</h4>\n' +
-        '                <button type="button" class="close" data-dismiss="modal">&times;</button>\n' +
-        '            </div>\n' +
-        '            <div class="modal-body">\n' +
-        '                <p> ' + modal_text1 + '<b>' + title + '</b>' + modal_text2 + '</p>\n' +
-        '            </div>\n' +
-        '            <div class="modal-footer" id="extension-footer">\n' +
-        '                <button type="button" class="btn default-color pull-left" data-dismiss="modal" onclick="extend_project('+ project_id +')">'+ yes + '</button>\n' +
-        '                <button type="button" class="btn danger-color pull-left" data-dismiss="modal" onclick="not_extend_project('+ project_id +')">' + no + '</button>\n' +
-        '                <button type="button" class="btn light-button-color" data-dismiss="modal">' + close + '</button>\n' +
-        '            </div>\n' +
-        '        </div>\n' +
-        '\n' +
-        '         </div>\n' +
-        '\n' +
-        '     </div>\n' +
-        '</div>'
 }
 
 /**
@@ -446,7 +389,7 @@ function editProfileModal() {
 /**
  * This function provides functionality for downloading the csv file.
  */
-function getcsvModal() {
+function getCSVModal() {
     let modalBody = $("#my-csv-body");
     $("#my-csv-title").text("Download Report");
     $("#my-csv-modal").modal("toggle");
@@ -454,7 +397,7 @@ function getcsvModal() {
     modalBody.html(`
             <div class="row">
                 <div class="col">
-                    Generates a csv file with data for all project registrations on active projects.
+                    Generates a csv file with data for all project registrations on active projects from given academic year.
                 </div>
             </div>            
         `);
@@ -462,50 +405,9 @@ function getcsvModal() {
     let downloadButton = $("#download-csv");
     downloadButton.off("click");
     downloadButton.click(function () {
-        $.ajax({
-            url: "/csv-data",
-            method: "GET",
-            dataType: 'json',
-            success: function (result) {
-                let csvContent = "data:text/csv;charset=utf-8,";
-
-                for (const entry of result){
-                    csvContent += entry.student_id + "," +
-                        entry.student_name + "," +
-                        entry.status + "," +
-                        entry.title + "," +
-                        entry.employee_name + "\n"
-                }
-
-                let encodedUri = encodeURI(csvContent);
-                let link = document.createElement("a");
-                link.setAttribute("href", encodedUri);
-                link.setAttribute("download", "registrations.csv");
-                document.body.appendChild(link); // Required for FF
-
-                link.click();
-            },
-            error: function (message) {
-                alert("failed");
-            }
-        });
+        let years = $('#yearSelector').val();
+        window.location = '/csv-data?years=' + years.join('+');
     });
-}
-
-/**
- * This function sends a post request to extend a project.
- * @param {number} project_id id for to be extended project
- */
-function extend_project(project_id) {
-    $.returnValues("extend_project/" + project_id);
-}
-
-/**
- * This function sends a post request to cancel extending a project.
- * @param {number} project_id id for to be canceled extension
- */
-function not_extend_project(project_id) {
-    $.returnValues("cancel_project_extension/" + project_id);
 }
 
 /**
@@ -518,6 +420,16 @@ function timestampToString(stamp) {
     return date.toLocaleDateString("en-US", options);
 }
 
-
-
-
+function addYears(){
+    let options = document.getElementById("yearSelector");
+    let today = new Date();
+    for(let i = 2019; i<=today.getFullYear(); i++){
+        let option = document.createElement("option");
+        let newYear = i + 1;
+        let academicYear = i.toString() + "-" + newYear.toString();
+        option.innerText = academicYear;
+        option.value = academicYear;
+        options.appendChild(option);
+    }
+    $('select').selectpicker();
+}

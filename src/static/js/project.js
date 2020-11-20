@@ -373,10 +373,30 @@ function edit_project() {
 }
 
 /**
+ * Check whether the removed types are still used.
+ * @param types The new chosen types.
+ * @returns {array} The removed types that are still used.
+ */
+function type_still_active(types){
+    let active_types = [];
+    if(!project['registrations']){
+        return []
+    }
+    for (const registration of project['registrations']){
+        if(!types.includes(registration['type'])){
+            active_types.push(registration['type']);
+        }
+    }
+    return active_types;
+}
+
+
+/**
  * This function provides functionality to save the modified content to the database.
  * @param {boolean} description_warning toggles the description warnings
+ * @param {boolean} type_warning toggles the project type warning
  */
-function save_project(description_warning=true) {
+function save_project(description_warning=true, type_warning=true) {
     project["title"] =  $('#title').text();
 
     let current_description = CKEDITOR.instances["description"].getData();
@@ -431,6 +451,27 @@ function save_project(description_warning=true) {
 
     if (!project['types'].length) {
         $("#error").show().text("Pick at least one type");
+        return;
+    }
+
+    let active_types = type_still_active(project['types']);
+    if(active_types.length > 0 && type_warning){
+        console.log("in ")
+        let err_text;
+        if(active_types.length === 1){
+            err_text = 'Type: \"' + active_types.join() + '\" is still used by a registration. The registration type for those registrations need to be changed by you. Are you sure you want to continue?'
+        }
+        else {
+            err_text = 'Types: ' + active_types.join() + '  are still used by a registration. The registration types for those registrations need to be changed by you. Are you sure you want to continue?'
+        }
+        const confirm_button = $(`<button class="btn btn-outline-success ml-2">Yes</button>`)
+            .click(function () {
+                save_project(description_warning, false)});
+
+        $("#error")
+            .show()
+            .text(err_text)
+            .append(confirm_button);
         return;
     }
 
@@ -610,7 +651,19 @@ function construct_project() {
         document.getElementById("modify-btn").setAttribute("style", "display: true;");
     }
 
+    if (role === 'student') {
+        fill_register_dropdown();
+    }
 }
+
+
+function fill_register_dropdown() {
+    let container = $('#registration-options');
+    for (let type of project['types']) {
+        container.append($(`<a class="dropdown-item" href="#" onclick="register_for_project('${type}')">${type}</a>`))
+    }
+}
+
 
 /**
  * Adds a description to the page.
@@ -753,17 +806,17 @@ function make_rg_popover(popover) {
 
 /**
  * Requests a registration to be made for the project.
- * @param confirmation_text English or Dutch confirmation text.
+ * @param type e.g. Thesis, Research Internship 1,...
  */
-function register_for_project(confirmation_text) {
+function register_for_project(type) {
     $.ajax({
         url: 'add-registration',
         type: 'POST',
-        data: {data: project['project_id']},
+        data: {data: project['project_id'], type: type},
         dataType: 'json',
         success: function () {
             const alert = $(`<div class="alert alert-success alert-dismissible fade show">
-                                ${confirmation_text}
+                                <strong>Success!</strong> Your registration is sent! You will be notified of any changes.
                                 <button type="button" class="close" data-dismiss="alert" aria-label="Close"> <span aria-hidden="true">&times;</span></button>
                             </div>`);
             $("#buttons").append(alert);
@@ -798,7 +851,12 @@ function construct_registrations() {
             <tr>
                 <td><a href="mailto:${registration['student_nr']}@ad.ua.ac.be">${registration['name']}</a></td>
                 <td class="text-center">${registration['student_nr']}</td>
-                <td align="right">
+                <td class="type">
+                    <select>
+                        ${project['types'].map(function (type) {return `<option value="${type}">${type}</option>`}).join('')}
+                    </select>
+                </td>
+                <td class="status" align="right">
                     <span id="status"></span>
                     <select>
                         <option value="Pending">Pending</option>
@@ -811,31 +869,36 @@ function construct_registrations() {
         `;
 
         const elem = $(row);
-        elem.find("select").val(registration['status']).on("change", function () {
-            const data = {
-                student_id: registration['student_nr'],
-                project_id: project['project_id'],
-                status: this.value
-            };
-
-            const status = elem.find("#status");
-            status.text("Saving..");
-
-            $.ajax({
-                url: "handle-registration",
-                method: "POST",
-                data: JSON.stringify(data),
-                contentType: 'application/json',
-                success: function () {
-                    status.text("Saved!");
-                },
-                error: function () {
-                    status.text("Error occurred");
-                }
-            });
-        });
+        elem.find('.type select').val(registration['type']).on('change', function () {
+            update_registration(registration, null, this.value)});
+        elem.find(".status select").val(registration['status']).on("change", function () { update_registration(registration, this.value, null) });
         registrations.append(elem);
     }
+}
+
+function update_registration(registration, new_status, new_type) {
+    const data = {
+        student_id: registration['student_nr'],
+        project_id: project['project_id'],
+        status: new_status,
+        type: new_type
+    };
+
+    const status = $("#status");
+    status.text("Saving..");
+
+    $.ajax({
+        url: "handle-registration",
+        method: "POST",
+        data: JSON.stringify(data),
+        contentType: 'application/json',
+        success: function () {
+            status.text("Saved!");
+        },
+        error: function () {
+            status.text("Error occurred");
+        }
+    });
 }
 
 /**

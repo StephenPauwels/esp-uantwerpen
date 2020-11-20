@@ -1,4 +1,3 @@
-from src.models.academic_year import *
 from src.models.attachment import *
 from src.models.document import *
 from src.models.employee import *
