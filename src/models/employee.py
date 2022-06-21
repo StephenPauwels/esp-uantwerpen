@@ -9,7 +9,7 @@ class Employee:
     """
 
     def __init__(self, employee_id, name, email, office, extra_info, picture_location, research_group, title, is_external,
-                 is_admin, is_active, is_promotor):
+                 is_admin, is_active, is_promotor=False):
         """
         Employee initializer.
         :param employee_id: The ID of the employee.

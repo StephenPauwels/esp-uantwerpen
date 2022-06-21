@@ -271,6 +271,7 @@ def get_all_project_data(p_id):
     active_only = not session["archive"]
     project_access = ProjectDataAccess(get_db())
     p_data = project_access.get_project(p_id, active_only)
+    is_promotor = project_access.is_promotor(p_id, current_user.user_id)
 
     if current_user.is_authenticated and current_user.role == "student":
         p_data.liked = LikeDataAccess(get_db()).is_liked(p_data.project_id, current_user.user_id)
@@ -302,7 +303,7 @@ def get_all_project_data(p_id):
         research_group = None
 
     return jsonify({"project_data": p_data.to_dict(), "research_group": research_group,
-                    "links": [obj.to_dict() for obj in linked_projects_data]})
+                    "links": [obj.to_dict() for obj in linked_projects_data], "promotor": is_promotor})
 
 
 @bp.route('/save-attachment', methods=['POST'])

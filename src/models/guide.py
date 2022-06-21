@@ -58,6 +58,16 @@ class GuideDataAccess:
             guides_objects.append(guides_obj)
         return guides_objects
 
+    def get_promotor_for_project(self, project_id):
+        """
+        Fetches the promotor for a given project.
+        :param project_id: The ID of the project.
+        :return: The employee_id of the promotor
+        """
+        cursor = self.dbconnect.get_cursor()
+        cursor.execute('SELECT employee, project, guidance_type FROM guide WHERE guidance_type=\'Promotor\' AND project = %s', (project_id,))
+        return cursor.fetchone()
+
     def add_guide(self, obj):
         """
         Adds a guide to the database.

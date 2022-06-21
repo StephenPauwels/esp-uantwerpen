@@ -4,6 +4,7 @@
 let project;
 let research_group;
 let links;
+let is_promotor;
 let groups;
 let types;
 let employees;
@@ -285,6 +286,7 @@ function fetch_project() {
             project = data["project_data"];
             research_group = data["research_group"];
             links = data["links"];
+            is_promotor = data["promotor"]
 
             construct_project();
             construct_description();
@@ -312,10 +314,14 @@ function refresh_active_button() {
         active_btn.attr("class", "btn my-2 btn-success");
         active_btn.text("Active")
     } else {
-        console.log("CHANGE ACTIVE");
         active_btn.attr("class", "btn my-2 btn-danger");
         active_btn.text("Inactive");
-        active_btn.disabled = true;
+    }
+
+    if (is_promotor) {
+        active_btn.prop('disabled', false);
+    } else {
+        active_btn.prop('disabled', true);
     }
 }
 
@@ -1092,7 +1098,6 @@ function getEditHTML() {
                 </div>
                 <div class="col">
                     <select style='width: 100%; max-width: 150px;' id="guidance-input">
-                        <option value="Promotor">Promotor</option>
                         <option value="Co-Promotor">Co-Promotor</option>
                         <option value="Mentor">Mentor</option>
                     </select>                
