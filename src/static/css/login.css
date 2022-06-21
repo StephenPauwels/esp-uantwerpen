@@ -9,16 +9,16 @@ html, body {
     height: 100%;
 }
 body {
-    font-family:'Calibri', sans-serif;
-    font-size: 16px;
-    font-weight:normal;
+    font-size: 18px;
+    font-family: Calibri,Helvetica, 'Calibri', sans-serif;
+    font-weight: normal;
     line-height: 1.5;
-    color: #717171;
-    background: #00426a;
+    color: #002e65;
+    background: #002e65;
 }
 a:link {
-    text-decoration: none;
-    color: #454545;
+    text-decoration: underline;
+    color: #ea2c38;
     font-weight: normal;
 }
 
@@ -148,26 +148,28 @@ form legend {
     box-sizing:border-box;
 }
 .form-field:focus {
-    border-color: #003366;
+    border-color: #002e65;
 }
 
-.form-button {
+.form-button, button {
     float: left;
     width: 100%;
-    background-color: #00426a;
+    background-color: #ea2c38;
     padding: 0px;
     margin: 0px;
     border: 0px;
     color: white;
-    font-size: 16px;
+    border-radius: 0.3rem;
+    font-size: 18px;
+    font-family: Calibri,Helvetica, 'Calibri', sans-serif;
     text-align: center;
     height: 42px;
     cursor: pointer;
--webkit-transition: all 0.3s ease-in-out;
--moz-transition: all 0.3s ease-in-out;
--ms-transition: all 0.3s ease-in-out;
--o-transition: all 0.3s ease-in-out;
-transition: all 0.3s ease-in-out;
+    -webkit-transition: all 0.3s ease-in-out;
+    -moz-transition: all 0.3s ease-in-out;
+    -ms-transition: all 0.3s ease-in-out;
+    -o-transition: all 0.3s ease-in-out;
+    transition: all 0.3s ease-in-out;
 }
 
 .form-button:hover {
@@ -200,7 +202,7 @@ transition: all 0.3s ease-in-out;
 footer {
     color: #ffffff;
     font-size: 14px;
-    background: #00426a;
+    background: #002e65;
     text-align: center;
 }
 .footer-text {
