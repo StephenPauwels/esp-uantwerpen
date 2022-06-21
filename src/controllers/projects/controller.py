@@ -289,11 +289,12 @@ def get_all_project_data(p_id):
     # Fill linked projects list with most viewed projects
     if len(linked_projects_data) < 4:
         projects_most_views = project_access.get_most_viewed_projects(8, active_only)
-        i = 0
-        while len(linked_projects_data) < 4:
-            if not projects_most_views[i].project_id == p_id:
-                linked_projects_data.add(projects_most_views[i])
-            i += 1
+        if len(projects_most_views) >= 4:
+            i = 0
+            while len(linked_projects_data) < 4:
+                if not projects_most_views[i].project_id == p_id:
+                    linked_projects_data.add(projects_most_views[i])
+                i += 1
 
     try:
         research_group = ResearchGroupDataAccess(get_db()).get_research_group(p_data.research_group).to_dict()

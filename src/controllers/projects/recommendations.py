@@ -40,7 +40,8 @@ def get_projects_with_recommendations():
     active_only = not session.get("archive", False)
     all_projects = [obj.to_dict() for obj in project_access.get_projects(active_only)]
 
-    max_views = project_access.get_most_viewed_projects(1, active_only)[0].view_count
+    most_viewed = project_access.get_most_viewed_projects(1, active_only)
+    max_views = most_viewed[0].view_count if len(most_viewed) > 0 else 0
     oldest, newest = project_access.get_oldest_and_newest()
     oldest = oldest.timestamp()
     biggest_difference = newest.timestamp() - oldest
