@@ -69,12 +69,14 @@ def get_projects_page_additional_data():
 
     all_types = TypeDataAccess(connection).get_types(active_only)
     employees = EmployeeDataAccess(connection).get_employees(active_only)
+    promotors = EmployeeDataAccess(connection).get_promotors(active_only)
     groups = ResearchGroupDataAccess(connection).get_group_names(active_only)
 
     result = {
         "types": [obj.type_name for obj in all_types],
         "employees": [obj.name for obj in employees],
-        "groups": groups
+        "groups": groups,
+        "promotors": [obj.name for obj in promotors]
     }
     return jsonify(result)
 

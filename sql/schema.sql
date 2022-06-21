@@ -45,7 +45,8 @@ CREATE TABLE employee
   title            EmployeeTitle,
   is_external      BOOLEAN      NOT NULL,
   is_admin         BOOLEAN      DEFAULT FALSE,
-  is_active        BOOLEAN      NOT NULL
+  is_active        BOOLEAN      NOT NULL,
+  is_promotor      BOOLEAN      NOT NULL DEFAULT FALSE
 );
 
 --Separate table for contact person to avoid a circular reference in Employee and research_group

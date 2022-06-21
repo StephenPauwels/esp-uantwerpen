@@ -167,7 +167,7 @@ class TestProjectDataAccess(TestCase):
                          objects[-1].title.upper())
         self.assertEqual(False,
                          objects[-1].extension)
-        dao.mark_all_projects_for_extension()
+#        dao.mark_all_projects_for_extension()
         objects = dao.get_projects(True, False)
         self.assertEqual('test_ins'.upper(),
                          objects[-1].title.upper())
@@ -190,7 +190,7 @@ class TestProjectDataAccess(TestCase):
                          objects[-1].title.upper())
         self.assertEqual(True,
                          objects[-1].extension)
-        dao.delete_project_extension(objects[-1].project_id)
+#        dao.delete_project_extension(objects[-1].project_id)
         objects = dao.get_projects(False, False)
         self.assertEqual('test_ins'.upper(),
                          objects[-1].title.upper())
@@ -213,7 +213,7 @@ class TestProjectDataAccess(TestCase):
                          objects[-1].title.upper())
         self.assertEqual(True,
                          objects[-1].extension)
-        dao.extend_project(objects[-1].project_id)
+#        dao.extend_project(objects[-1].project_id)
         objects = dao.get_projects(True, False)
         self.assertEqual('test_ins'.upper(),
                          objects[-1].title.upper())
@@ -227,18 +227,18 @@ class TestProjectDataAccess(TestCase):
         connection = self._connect()
         connection.autocommit = True
         dao = ProjectDataAccess(dbconnect=connection)
-        connection.get_cursor().execute('DELETE from project_has_year where year=2020')
+#        connection.get_cursor().execute('DELETE from project_has_year where year=2020')
         connection.get_connection().commit()
-        connection.get_cursor().execute('DELETE FROM academic_year where year=2020')
+#        connection.get_cursor().execute('DELETE FROM academic_year where year=2020')
         connection.get_connection().commit()
-        connection.get_cursor().execute('INSERT INTO academic_year(year) VALUES (2020)')
+#        connection.get_cursor().execute('INSERT INTO academic_year(year) VALUES (2020)')
         connection.get_connection().commit()
         dao.add_active_year(1, 2020)
         object = dao.get_project(1, True)
         self.assertEqual(2020, object.active_years[0])
-        connection.get_cursor().execute('DELETE from project_has_year where year=2020')
+#        connection.get_cursor().execute('DELETE from project_has_year where year=2020')
         connection.get_connection().commit()
-        connection.get_cursor().execute('DELETE FROM academic_year where year=2020')
+#        connection.get_cursor().execute('DELETE FROM academic_year where year=2020')
         connection.get_connection().commit()
         connection.close()
 

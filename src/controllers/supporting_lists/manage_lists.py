@@ -50,6 +50,9 @@ def add_item(data):
     elif obj_type == "tag":
         return add_tag(data)
 
+    elif obj_type == "promotor":
+        return add_promotor(data)
+
     else:
         return jsonify({'success': False, "message": "Object type incorrect"}), 400, {'ContentType': 'application/json'}
 
@@ -89,6 +92,23 @@ def add_employee(data):
         employee = Employee(data["name"], data["name"], data["email"], data["office"], data.get("extra_info"), picture,
                             data["research_group"], data["title"] if data.get("title") else None, data["is_external"], False, True)
         dao.add_employee(employee)
+        return jsonify({'success': True}), 200, {'ContentType': 'application/json'}
+
+    except Exception as e:
+        return jsonify({'success': False, "message": str(e)}), 400, {'ContentType': 'application/json'}
+
+
+def add_promotor(data):
+    """
+    Handles addition of promotor.
+    :param data: data object to be added
+    :return: Json with success/failure status and error message
+    """
+    try:
+        dao = EmployeeDataAccess(get_db())
+        employee = dao.get_employee_by_name(data["name"])
+        employee.is_promotor = True
+        dao.update_employee(employee)
         return jsonify({'success': True}), 200, {'ContentType': 'application/json'}
 
     except Exception as e:
@@ -275,6 +295,9 @@ def activation(data):
     elif obj_type == "types":
         dao = TypeDataAccess(get_db())
 
+    elif obj_type == "promotors":
+        dao = EmployeeDataAccess(get_db())
+
     else:
         return jsonify({'success': False, "message": "Object type incorrect"}), 400, {'ContentType': 'application/json'}
 
@@ -283,6 +306,9 @@ def activation(data):
 
             if obj_type == "tags":
                 dao.remove_tag(elem)
+            elif obj_type == "promotors":
+                emp = dao.get_employee_by_name(elem)
+                dao.set_promotor(emp.e_id, False)
             else:
                 dao.set_active(elem, activate)
 

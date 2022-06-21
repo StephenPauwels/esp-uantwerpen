@@ -53,7 +53,7 @@ class TestResearchGroupDataAccess(TestCase):
         connection.get_cursor().execute('DELETE from research_group where name=\'test_ins\'')
         connection.get_connection().commit()
         dao = ResearchGroupDataAccess(dbconnect=connection)
-        obj = ResearchGroup(name='test_ins', abbreviation= "test", logo_location=None, description_id=1, address=None, telephone_number=None, study_field='chocolate eating', is_active=True)
+        obj = ResearchGroup(name='test_ins', abbreviation= "test", logo_location=None, description_id=1, address=None, telephone_number=None, is_active=True)
         dao.add_research_group(obj)
         objects = dao.get_research_groups(True)
         self.assertEqual('test_ins'.upper(),
@@ -68,13 +68,13 @@ class TestResearchGroupDataAccess(TestCase):
         connection.get_connection().commit()
         dao = ResearchGroupDataAccess(dbconnect=connection)
         obj = ResearchGroup(name='test_ins', abbreviation="test", logo_location=None, description_id=1, address=None,
-                            telephone_number=None, study_field='chocolate eating', is_active=True)
+                            telephone_number=None, is_active=True)
         dao.add_research_group(obj)
         objects = dao.get_research_groups(True)
         self.assertEqual('test'.upper(),
                          objects[-1].abbreviation.upper())
         obj2 = ResearchGroup(name='test_ins', abbreviation="test2", logo_location=None, description_id=1, address=None,
-                            telephone_number=None, study_field='chocolate eating', is_active=True)
+                            telephone_number=None, is_active=True)
         dao.update_research_group(obj.name, obj2)
         objects = dao.get_research_groups(True)
         self.assertEqual('test2'.upper(),
@@ -89,7 +89,7 @@ class TestResearchGroupDataAccess(TestCase):
         connection.get_connection().commit()
         dao = ResearchGroupDataAccess(dbconnect=connection)
         obj = ResearchGroup(name='test_ins', abbreviation="test", logo_location=None, description_id=1, address=None,
-                            telephone_number=None, study_field='chocolate eating', is_active=True)
+                            telephone_number=None, is_active=True)
         dao.add_research_group(obj)
         objects = dao.get_research_groups(True)
         self.assertEqual('test_ins'.upper(),

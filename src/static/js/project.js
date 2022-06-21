@@ -7,6 +7,7 @@ let links;
 let groups;
 let types;
 let employees;
+let promotors;
 
 
 // Dropzone configuration
@@ -106,7 +107,7 @@ function new_project() {
         html_content_nl: "Een fantastisch project idee is ontstaan",
         attachments: [],
         max_students: 1,
-        is_active: true
+        is_active: false
     };
     $("#modify-btn").show();
     $("#title").text("Project Title");
@@ -122,10 +123,12 @@ function fetch_additional_data(callback) {
         url: "projects-page-additional",
         success: function (result) {
             employees = result["employees"];
+            promotors = result["promotors"];
             types = result["types"];
             groups = result["groups"];
 
-            init_supervisors_input();
+            init_supervisors_input(true);
+            init_supervisors_input(false);
             init_selectpickers();
 
             if (callback) {
@@ -213,8 +216,17 @@ function init_selectpickers() {
 /**
  * This function initializes the supervisor input.
  */
-function init_supervisors_input() {
-    const supervisors_input = $("#supervisors input");
+function init_supervisors_input(promotor) {
+    let supervisors_input;
+    let list_source;
+    if (promotor) {
+        supervisors_input = $("#promotors input");
+        list_source = promotors;
+    } else {
+        supervisors_input = $("#co-promotors input, #mentors input");
+        list_source = employees;
+    }
+    //const supervisors_input = $("#supervisors input");
 
     // Initialize the tagsinput with autocomplete for employees
     supervisors_input.tagsinput({
@@ -224,7 +236,7 @@ function init_supervisors_input() {
             afterSelect: function (val) {
                 this.$element.val("");
             },
-            source: employees
+            source: list_source
         },
         freeInput: false
     });
@@ -300,8 +312,10 @@ function refresh_active_button() {
         active_btn.attr("class", "btn my-2 btn-success");
         active_btn.text("Active")
     } else {
+        console.log("CHANGE ACTIVE");
         active_btn.attr("class", "btn my-2 btn-danger");
         active_btn.text("Inactive");
+        active_btn.disabled = true;
     }
 }
 

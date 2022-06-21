@@ -71,7 +71,7 @@
             <button type="button" class="btn default-color my-2" id="external-employee-btn"
                     style="display: none;">Add a new (external) person</button>
             <button type="button" id="active-btn"
-                    style="display: none;"></button>
+                    style="display: none;" disabled></button>
 
         </div>
 
@@ -104,12 +104,12 @@
         <!-- Supervisors -->
         <div class="my-4 text-center card-deck justify-content-center" id="supervisors">
 
-
+                <!-- TODO: Change to only allow one promotor -->
                 <div class="card" id="promotors" style="display: none;">
-                    <div class="card-header"><h4 class="my-0">Promotors</h4></div>
+                    <div class="card-header"><h4 class="my-0">Promotor</h4></div>
                     <div class="card-body">
                         <ul class="list-unstyled" id="promotors-list"></ul>
-                        <input type="text" id="promotors-input" style="display: none; margin-top: 1em;" placeholder="Add an employee"
+                        <input type="text" id="promotors-input" style="display: none; margin-top: 1em;" placeholder="Add a promotor"
                                data-provide="typeahead">
                     </div>
                 </div>

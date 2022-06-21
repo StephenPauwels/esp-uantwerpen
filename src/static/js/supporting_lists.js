@@ -1,7 +1,7 @@
 'use strict';
 
 // Enum to indicate current tab
-const tab = {TAGS: 1, TYPES: 2, GROUPS: 3, EMPLOYEES: 5};
+const tab = {TAGS: 1, TYPES: 2, GROUPS: 3, EMPLOYEES: 5, PROMOTORS: 6};
 
 // Global variables
 let tags = [];
@@ -10,6 +10,8 @@ let researchGroups = [];
 let studyFields = [];
 let employees = [];
 let employeeNames = [];
+let promotors = [];
+let promotorNames = [];
 
 let currentElements = [];
 let currentTab = tab.GROUPS;
@@ -58,8 +60,15 @@ function refreshData() {
             types = result["types"];
             researchGroups = result["research groups"];
             employees = result["employees"];
+            promotors = result["promotors"];
+            employeeNames = [];
             for (let emp of employees) {
                 employeeNames.push(emp["name"]);
+            }
+
+            promotorNames = [];
+            for (let prom of promotors) {
+                promotorNames.push(prom["name"]);
             }
 
             function getSort(fieldName) {
@@ -79,6 +88,7 @@ function refreshData() {
             employees.sort(getSort("name"));
             researchGroups.sort(getSort("name"));
             types.sort(getSort("type_name"));
+            promotors.sort(getSort("name"));
 
             initGroupSelector();
             refreshContent();
@@ -117,7 +127,7 @@ function refreshContent(type = currentTab) {
         currentTab = type;
     }
 
-    if (type === tab.EMPLOYEES) {
+    if (type === tab.EMPLOYEES || type == tab.PROMOTORS) {
         $("#research-group-selector").show();
     } else {
         $("#research-group-selector").hide();
@@ -146,7 +156,7 @@ function refreshContent(type = currentTab) {
             active = true;
         }
 
-        if (type === tab.EMPLOYEES) {
+        if (type === tab.EMPLOYEES || type == tab.PROMOTORS) {
             let listItem = createListItem(i, list[i]["name"], active);
             make_popover(listItem.find("a")[0]);
             populate_popover(listItem.find("a")[0], list[i]);
@@ -165,7 +175,7 @@ function refreshContent(type = currentTab) {
 
     currentElements = list;
 
-    if (type === tab.EMPLOYEES) {
+    if (type === tab.EMPLOYEES || type == tab.PROMOTORS) {
         // Makes the popovers work
         $('[data-toggle="popover"]').popover({
             html: true,
@@ -186,6 +196,7 @@ function tabToString(obj) {
         case tab.GROUPS: return "groups";
         case tab.TAGS: return "tags";
         case tab.TYPES: return "types";
+        case tab.PROMOTORS: return "promotors";
     }
 }
 
@@ -213,6 +224,10 @@ function activationModal() {
     } else if (currentTab === tab.TYPES) {
         for (let elem of checkedElements) {
             elementKeys.push(elem["type_name"]);
+        }
+    } else if (currentTab === tab.PROMOTORS) {
+        for (let elem of checkedElements) {
+            elementKeys.push(elem["name"]);
         }
     } else {
         for (let elem of checkedElements) {
@@ -437,6 +452,9 @@ function getEditData() {
     } else if (currentTab === tab.TAGS) {
         data["object"] = "tag";
         data["string"] = $("#modal-input").val();
+    } else if (currentTab == tab.PROMOTORS) {
+        data["object"] = "promotor";
+        data["name"] = $("#employee-input").val();
     }
     return data;
 }
@@ -462,6 +480,8 @@ function addModal() {
         $("#modal-title").text("Add new research group");
     } else if (currentTab === tab.EMPLOYEES) {
         $("#modal-title").text("Add new employee");
+    } else if (currentTab == tab.PROMOTORS) {
+        $("#modal-title").text("Add new promotor");
     }
 
     $("#modal-body").html(getEditHTML());
@@ -645,7 +665,19 @@ function getEditHTML() {
             </div>
         `;
         return item;
-    } else {
+    }  else if (currentTab === tab.PROMOTORS) {
+        let output = `<select style='width: 100%; max-width: 150px;' id="employee-input">`;
+
+        let options = `<option value="">None</option>`;
+        for (let emp of employees) {
+            if (!promotorNames.includes(emp.name)) {
+                options += `<option value="${emp.name}">${emp.name}</option>`;
+            }
+        }
+        output += options;
+        output += `</select>`;
+        return output;
+    }   else {
         return `<input id="modal-input" class="form-control">`;
     }
 }
@@ -663,6 +695,10 @@ function setupButtons() {
         selectAll.show();
         editSelected.show();
         add.hide();
+    } else if (currentTab == tab.PROMOTORS) {
+        selectAll.show();
+        editSelected.hide();
+        add.show();
     } else {
         selectAll.hide();
         editSelected.hide();
@@ -716,7 +752,7 @@ function searchFilter(list, type) {
 
     let result = [];
     for (let element of list) {
-        if (type === tab.EMPLOYEES || type === tab.GROUPS) {
+        if (type === tab.EMPLOYEES || type === tab.GROUPS || type == tab.PROMOTORS) {
             if (element["name"].toLowerCase().indexOf(searchQuery) !== -1) {
                 result.push(element);
             }
@@ -748,6 +784,8 @@ function getListForTab(type) {
         return researchGroups;
     } else if (type === tab.EMPLOYEES) {
         return employees;
+    } else if (type == tab.PROMOTORS) {
+        return promotors;
     }
 }
 
