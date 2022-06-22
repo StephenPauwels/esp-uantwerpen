@@ -168,22 +168,12 @@ class RegistrationDataAccess:
             date_select = ""
 
         cursor = self.dbconnect.get_cursor()
-        cursor.execute("select S.student_id, S.name, PR.type, PR.status, PR.date, P.title, string_agg(E.name, ' - ' ORDER BY E.name) "
+        cursor.execute("select S.student_id, S.name, PR.type, PR.status, PR.date, PR.project "
                        "from project_registration PR "
                        "left join student S on S.student_id = PR.student "
-                       "left join guide G on G.project = PR.project "
-                       "left join project P on P.project_id = PR.project "
-                       "left join employee E on E.id = G.employee "
                        + date_select +
-                       "group by PR.status, PR.type, PR.date,S.student_id, S.name, P.title ")
+                       "group by PR.status, PR.type, PR.date,S.student_id, S.name, PR.project ")
         data = list()
-        data.append({"student_id": 'Student ID',
-                     "student_name": 'Student Name',
-                     "type": 'Type',
-                     "status": 'Status',
-                     "date": 'Last Change',
-                     "title": 'Title',
-                     "employee_name": 'Employee Name(s)'})
 
         for row in cursor:
             data.append({"student_id": row[0],
@@ -191,6 +181,5 @@ class RegistrationDataAccess:
                          "type": row[2],
                          "status": row[3],
                          "date": str(row[4].day) + "/" + str(row[4].month) + "/" + str(row[4].year),
-                         "title": row[5],
-                         "employee_name": row[6]})
+                         "project_id": row[5]})
         return data

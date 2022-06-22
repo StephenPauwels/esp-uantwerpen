@@ -98,7 +98,7 @@ $(document).ready(function ($) {
 
     $("#my-csv").click(function () {
         getCSVModal();
-        addYears();
+        addCsvYears();
     });
 
 /*    $("#extension-confirmation").click(function () {
@@ -420,7 +420,7 @@ function timestampToString(stamp) {
     return date.toLocaleDateString("en-US", options);
 }
 
-function addYears(){
+function addCsvYears(){
     let options = document.getElementById("yearSelector");
     let today = new Date();
     for(let i = 2019; i<=today.getFullYear(); i++){
@@ -431,5 +431,5 @@ function addYears(){
         option.value = academicYear;
         options.appendChild(option);
     }
-    $('select').selectpicker();
+    $('#yearSelector').selectpicker();
 }

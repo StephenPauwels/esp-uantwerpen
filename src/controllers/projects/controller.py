@@ -411,6 +411,34 @@ def update_recommendations(p1_id, p2_id, amount):
         return ""
 
 
+def process_registration_data(registrations):
+    project_acces = ProjectDataAccess(get_db())
+
+    records = list()
+
+    for reg in registrations:
+        p_id = reg["project_id"]
+        project = project_acces.get_project(p_id, False)
+        project_acces.minimize_project(project)
+
+        promotor = ",".join(project.employees.get("Promotor", ["-"]))
+        co_promotor = ",".join(project.employees.get("Co-Promotor", ["-"]))
+        mentor = ",".join(project.employees.get("Mentor", ["-"]))
+
+        record = {
+            'student_name': reg['student_name'],
+            'status': reg['status'],
+            'date': reg['date'],
+            'type': reg['type'],
+            'title': project.title,
+            'promotor': promotor,
+            'co-promotor': co_promotor,
+            'mentor': mentor
+        }
+        records.append(record)
+    return records
+
+
 @bp.route('/csv-data')
 def get_csv_data():
     """
@@ -422,24 +450,52 @@ def get_csv_data():
     else:
         years = request.args['years']
         years = years.split()
-        data = RegistrationDataAccess(get_db()).get_csv_data(years)
+        registrations = RegistrationDataAccess(get_db()).get_csv_data(years)
+        data = process_registration_data(registrations)
 
         file = os.path.join(config_data['file-storage'], 'Registrations.xlsx')
         workbook = xlsxwriter.Workbook(file)
         worksheet = workbook.add_worksheet()
 
-        row = 0
+        # Create header
+        worksheet.write(0, 0, "Student Name")
+        worksheet.write(0, 1, "Status")
+        worksheet.write(0, 2, "Last Change")
+        worksheet.write(0, 3, "Type")
+        worksheet.write(0, 4, "Project")
+        worksheet.write(0, 5, "Promotor")
+        worksheet.write(0, 6, "Other Promotor(s)")
+        worksheet.write(0, 7, "Mentor(s)")
+
+        row = 1
         for registration in data:
             worksheet.write(row, 0, registration['student_name'])
             worksheet.write(row, 1, registration['status'])
             worksheet.write(row, 2, registration['date'])
             worksheet.write(row, 3, registration['type'])
             worksheet.write(row, 4, registration['title'])
-            worksheet.write(row, 5, registration['employee_name'])
+            worksheet.write(row, 5, registration['promotor'])
+            worksheet.write(row, 6, registration['co-promotor'])
+            worksheet.write(row, 7, registration['mentor'])
             row += 1
 
         workbook.close()
 
         filename = 'Registrations_' + datetime.today().strftime('%d-%m-%Y') + '.xlsx'
         return send_file(file, attachment_filename=filename, as_attachment=True)
+
+
+@bp.route('/overview')
+def get_overview():
+    if not current_user.is_authenticated or (current_user.role != "admin" and current_user.role != "employee"):
+        return '<div class="title">Er ging iets mis bij het genereren van het rapport</div>'
+    else:
+        records = []
+
+        if 'year' in request.args and request.args['year'] != "":
+            registrations = RegistrationDataAccess(get_db()).get_csv_data([request.args['year']])
+
+            records = process_registration_data(registrations)
+
+        return render_template('overview.html', registration_data=records)
 

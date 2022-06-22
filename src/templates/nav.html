@@ -124,6 +124,7 @@
                         <a class="dropdown-item"
                            href="{{ url_for("projects.projects") + "?edit=true" }}">{{ get_text("Projects") }}</a>
                         <a class="dropdown-item" href="#" id="my-profile">{{ get_text("My Profile") }}</a>
+                        <a class="dropdown-item" href="{{ url_for("projects.get_overview") }}">{{ get_text("Overview") }}</a>
                         <a class="dropdown-item" href="#" id="my-csv">{{ get_text("project-csv") }}</a>
 
                         {% if current_user.role == "admin" %}

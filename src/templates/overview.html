@@ -1,0 +1,74 @@
+{% extends "layout.html" %}
+
+{% block title %}Projects overview{% endblock %}
+
+{% block head %}
+    <script src='{{ url_for('static', filename='js/overview.js') }}' type="text/javascript" xmlns=""></script>
+{% endblock %}
+
+{% block content %}
+
+
+    <div class="container">
+        <p>
+            <div class="row">
+                <div class="col-md-auto">
+                    <form class="form-inline col-auto w-100 p-0">
+                        <div class="dropdown bootstrap-select" style="width:auto;">
+                            <select class="w-auto" id="yearOverview" title="Registration year:"
+                            style="width:40% !important; margin-left: 2% !important; margin-bottom: 2px !important;"></select>
+                        </div>
+                        <button form="" autofocus class="btn search-button-color my-sm-0" id="generate" type="submit"
+                                style="width:50% !important; margin-left: 2% !important; margin-bottom: 2px !important;">
+                            {{ get_text("Generate") }}
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </p>
+
+        <div class="row">
+            <table class="table table-condensed" style="width:100%;">
+                <thead>
+                    <tr>
+                        <th class="text-nowrap">Student</th>
+                        <th class="text-nowrap">Status</th>
+                        <th class="text-nowrap">Last Change</th>
+                        <th class="text-nowrap">Type</th>
+                        <th class="text-nowrap">Project</th>
+                        <th class="text-nowrap">Promotor</th>
+                        <th class="text-nowrap">Co-Promotor</th>
+                        <th class="text-nowrap">Mentor</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% if registration_data|length == 0 %}
+                        <td colspan="8">No data available!</td>
+                    {% else %}
+                        {% for reg in registration_data %}
+                            <tr>
+                                <td class="text-nowrap">{{ reg['student_name'] }}</td>
+                                <td class="text-nowrap">
+                                {%  if reg['status'] == "Accepted" %}
+                                    <button class="btn search-button-color" disabled>{{ reg['status'] }}</button>
+                                {% elif reg['status'] == "Denied"  %}
+                                    <button class="btn btn-danger" disabled>{{ reg['status'] }}</button>
+                                {% else %}
+                                    <button class="btn btn-warning" disabled>{{ reg['status'] }}</button>
+                                {% endif %}
+                                </td>
+                                <td class="text-nowrap">{{ reg['date'] }}</td>
+                                <td class="text-nowrap">{{ reg['type'] }}</td>
+                                <td class="text-break">{{ reg['title'] }}</td>
+                                <td class="text-nowrap">{{ reg['promotor'] }}</td>
+                                <td class="text-nowrap">{{ reg['co-promotor'] }}</td>
+                                <td class="text-nowrap">{{ reg['mentor'] }}</td>
+                            </tr>
+                        {% endfor %}
+                    {% endif %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+{% endblock %}
