@@ -12,18 +12,15 @@
     <div class="container">
         <p>
             <div class="row">
-                <div class="col-md-auto">
-                    <form class="form-inline col-auto w-100 p-0">
-                        <div class="dropdown bootstrap-select" style="width:auto;">
-                            <select class="w-auto" id="yearOverview" title="Registration year:"
-                            style="width:40% !important; margin-left: 2% !important; margin-bottom: 2px !important;"></select>
-                        </div>
-                        <button form="" autofocus class="btn search-button-color my-sm-0" id="generate" type="submit"
-                                style="width:50% !important; margin-left: 2% !important; margin-bottom: 2px !important;">
-                            {{ get_text("Generate") }}
-                        </button>
-                    </form>
-                </div>
+                <form class="form-inline col-auto w-100 p-0">
+                    <select id="yearOverview" title="Registration year"
+                    style="width: 90%; margin-bottom: 2px !important;"></select>
+
+                    <button form="" autofocus class="btn search-button-color" id="generate" type="submit"
+                            style="margin-left: 2% !important; margin-bottom: 2px !important;">
+                        {{ get_text("Generate") }}
+                    </button>
+                </form>
             </div>
         </p>
 
