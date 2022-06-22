@@ -432,6 +432,7 @@ def process_registration_data(registrations):
             'date': reg['date'],
             'type': reg['type'],
             'title': project.title,
+            'project_id': project.project_id,
             'promotor': promotor,
             'co-promotor': co_promotor,
             'mentor': mentor

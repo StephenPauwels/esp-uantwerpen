@@ -124,7 +124,7 @@ class ProjectDataAccess:
         for project_id in self.get_project_ids(False):
             p = self.get_project(project_id, False)
             for emp in p.employees:
-                if emp.guidance_type == "Promotor" and emp.employee.e_id == promotor_id:
+                if emp.guidance_type == "Promotor" and emp.employee.e_id.lower() == promotor_id.lower():
                     if not details:
                         self.minimize_project(p)
 
@@ -135,7 +135,7 @@ class ProjectDataAccess:
     def is_promotor(self, project_id, promotor_id):
         p = self.get_project(project_id, False)
         for emp in p.employees:
-            if emp.guidance_type == "Promotor" and emp.employee.e_id == promotor_id:
+            if emp.guidance_type == "Promotor" and emp.employee.e_id.lower() == promotor_id.lower():
                 return True
         return False
 

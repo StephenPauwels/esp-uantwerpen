@@ -25,43 +25,49 @@
         </p>
 
         <div class="row">
-            <table class="table table-condensed" style="width:100%;">
+        {% if current_theme == "dark" %}
+            <table class="table text-nowrap table-dark table-responsive" style="width:100%;margin-left:auto;margin-right:auto;">
+        {% else %}
+            <table class="table text-nowrap table-responsive" style="width:100%;margin-left:auto;margin-right:auto;">
+        {% endif %}
                 <thead>
                     <tr>
-                        <th class="text-nowrap"><a href={{ url_for("projects.get_overview", sort="student_name", year=current_year) }}>Student Name</a></th>
-                        <th class="text-nowrap"><a href={{ url_for("projects.get_overview", sort="student_id", year=current_year) }}>Student ID</a></th>
-                        <th class="text-nowrap"><a href={{ url_for("projects.get_overview", sort="status", year=current_year) }}>Status</a></th>
-                        <th class="text-nowrap"><a href={{ url_for("projects.get_overview", sort="date", year=current_year) }}>Last Change</a></th>
-                        <th class="text-nowrap"><a href={{ url_for("projects.get_overview", sort="type", year=current_year) }}>Type</a></th>
-                        <th class="text-nowrap"><a href={{ url_for("projects.get_overview", sort="title", year=current_year) }}>Project</a></th>
-                        <th class="text-nowrap"><a href={{ url_for("projects.get_overview", sort="promotor", year=current_year) }}>Promotor</a></th>
-                        <th class="text-nowrap"><a href={{ url_for("projects.get_overview", sort="co-promotor", year=current_year) }}>Other Promotor(s)</a></th>
-                        <th class="text-nowrap"><a href={{ url_for("projects.get_overview", sort="mentor", year=current_year) }}>Mentor(s)</a></th>
+                        <th><a href={{ url_for("projects.get_overview", sort="student_name", year=current_year) }}>Student Name</a></th>
+                        <th><a href={{ url_for("projects.get_overview", sort="student_id", year=current_year) }}>Student ID</a></th>
+                        <th><a href={{ url_for("projects.get_overview", sort="status", year=current_year) }}>Status</a></th>
+                        <th><a href={{ url_for("projects.get_overview", sort="date", year=current_year) }}>Last Change</a></th>
+                        <th><a href={{ url_for("projects.get_overview", sort="type", year=current_year) }}>Type</a></th>
+                        <th><a href={{ url_for("projects.get_overview", sort="title", year=current_year) }}>Project</a></th>
+                        <th><a href={{ url_for("projects.get_overview", sort="promotor", year=current_year) }}>Promotor</a></th>
+                        <th><a href={{ url_for("projects.get_overview", sort="co-promotor", year=current_year) }}>Other Promotor(s)</a></th>
+                        <th><a href={{ url_for("projects.get_overview", sort="mentor", year=current_year) }}>Mentor(s)</a></th>
                     </tr>
                 </thead>
                 <tbody>
-                    {% if registration_data|length == 0 %}
+                    {% if current_year == "" %}
+                        <td colspan="9">No year selected!</td>
+                    {% elif registration_data|length == 0%}
                         <td colspan="9">No data available!</td>
                     {% else %}
                         {% for reg in registration_data %}
                             <tr>
-                                <td class="text-nowrap">{{ reg['student_name'] }}</td>
-                                <td class="text-nowrap">{{ reg['student_id'] }}</td>
-                                <td class="text-nowrap">
+                                <td>{{ reg['student_name'] }}</td>
+                                <td>{{ reg['student_id'] }}</td>
+                                <td>
                                 {%  if reg['status'] == "Accepted" %}
-                                    <button class="btn search-button-color" disabled>{{ reg['status'] }}</button>
+                                    <button class="btn btn-success" disabled>{{ reg['status'] }}</button>
                                 {% elif reg['status'] == "Denied"  %}
                                     <button class="btn btn-danger" disabled>{{ reg['status'] }}</button>
                                 {% else %}
                                     <button class="btn btn-warning" disabled>{{ reg['status'] }}</button>
                                 {% endif %}
                                 </td>
-                                <td class="text-nowrap">{{ reg['date'] }}</td>
-                                <td class="text-nowrap">{{ reg['type'] }}</td>
-                                <td class="text-break">{{ reg['title'] }}</td>
-                                <td class="text-nowrap">{{ reg['promotor'] }}</td>
-                                <td class="text-nowrap">{{ reg['co-promotor'] }}</td>
-                                <td class="text-nowrap">{{ reg['mentor'] }}</td>
+                                <td>{{ reg['date'] }}</td>
+                                <td>{{ reg['type'] }}</td>
+                                <td><a href={{ url_for("projects.project_page", project_id=reg['project_id']) }}>{{ reg['title'] }}</a></td>
+                                <td>{{ reg['promotor'] }}</td>
+                                <td>{{ reg['co-promotor'] }}</td>
+                                <td>{{ reg['mentor'] }}</td>
                             </tr>
                         {% endfor %}
                     {% endif %}

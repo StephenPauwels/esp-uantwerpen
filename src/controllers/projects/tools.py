@@ -69,11 +69,12 @@ def project_editor(data):
                 print(prev_promotor, employee.e_id)
                 if new_project:
                     msg = "A new project (%s) has been added. Please visit the ESP website to activate this project." % (project.title)
+                    send_mail(promotor_email, "ESP Project Added", msg)
                 elif not prev_promotor or prev_promotor[0] != employee.e_id:
                     msg = "A change to project %s has been made and the project is currently not active. Please visit the ESP website to activate this project" % (project.title)
                     # If promotor is changed -> is_active is set to False
                     project_access.update_project(p_id, title, max_students, group, False)
-                send_mail(promotor_email, "ESP Project Added", msg)
+                    send_mail(promotor_email, "ESP Project Updated", msg)
                 break
 
     copromotorlist = data['co-promotors']

@@ -171,8 +171,11 @@ function init_description_toggle() {
  */
 function init_tag_generator() {
     $('#generate-tags-btn').click(function() {
-        let title = CKEDITOR.instances.title.getData();
-        let both_descriptions = CKEDITOR.instances.description.getData();
+        //console.log(CKEDITOR.instances);
+        //let title = CKEDITOR.instances.title.getData();
+        //let both_descriptions = CKEDITOR.instances.description.getData();
+        let both_descriptions = "";
+        let title = project["title"]
         const english = $("#description-toggle").prop('checked');
         if (english) {
             both_descriptions += " " + project['html_content_nl'];

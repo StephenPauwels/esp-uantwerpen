@@ -423,7 +423,7 @@ function timestampToString(stamp) {
 function addCsvYears(){
     let options = document.getElementById("yearSelector");
     let today = new Date();
-    for(let i = 2019; i<=today.getFullYear(); i++){
+    for(let i = today.getFullYear(); i >= 2019; i--){
         let option = document.createElement("option");
         let newYear = i + 1;
         let academicYear = i.toString() + "-" + newYear.toString();
