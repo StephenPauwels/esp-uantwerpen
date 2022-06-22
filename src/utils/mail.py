@@ -24,6 +24,7 @@ def send_mail(address, subject, message):
                '-o', 'message-content-type=html',
                '-m', message,
                '-s', 'smtp.uantwerpen.be']
+        print(address, message)
         return True
         # TODO: re-enable
         # proc = subprocess.Popen(cmd)

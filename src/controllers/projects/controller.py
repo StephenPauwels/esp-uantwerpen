@@ -504,7 +504,11 @@ def get_overview():
             records = process_registration_data(registrations)
 
         if 'sort' in request.args:
-            records = sorted(records, key=lambda l: l[request.args['sort']])
+            if request.args['sort'] == "date":
+                from datetime import datetime
+                records = sorted(records, key=lambda l: datetime.strptime(l['date'], "%d/%m/%Y"), reverse=True)
+            else:
+                records = sorted(records, key=lambda l: l[request.args['sort']])
 
         return render_template('overview.html', registration_data=records, current_year=year)
 
