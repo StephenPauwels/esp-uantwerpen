@@ -28,23 +28,25 @@
             <table class="table table-condensed" style="width:100%;">
                 <thead>
                     <tr>
-                        <th class="text-nowrap">Student</th>
-                        <th class="text-nowrap">Status</th>
-                        <th class="text-nowrap">Last Change</th>
-                        <th class="text-nowrap">Type</th>
-                        <th class="text-nowrap">Project</th>
-                        <th class="text-nowrap">Promotor</th>
-                        <th class="text-nowrap">Other Promotor(s)</th>
-                        <th class="text-nowrap">Mentor(s)</th>
+                        <th class="text-nowrap"><a href={{ url_for("projects.get_overview", sort="student_name", year=current_year) }}>Student Name</a></th>
+                        <th class="text-nowrap"><a href={{ url_for("projects.get_overview", sort="student_id", year=current_year) }}>Student ID</a></th>
+                        <th class="text-nowrap"><a href={{ url_for("projects.get_overview", sort="status", year=current_year) }}>Status</a></th>
+                        <th class="text-nowrap"><a href={{ url_for("projects.get_overview", sort="date", year=current_year) }}>Last Change</a></th>
+                        <th class="text-nowrap"><a href={{ url_for("projects.get_overview", sort="type", year=current_year) }}>Type</a></th>
+                        <th class="text-nowrap"><a href={{ url_for("projects.get_overview", sort="title", year=current_year) }}>Project</a></th>
+                        <th class="text-nowrap"><a href={{ url_for("projects.get_overview", sort="promotor", year=current_year) }}>Promotor</a></th>
+                        <th class="text-nowrap"><a href={{ url_for("projects.get_overview", sort="co-promotor", year=current_year) }}>Other Promotor(s)</a></th>
+                        <th class="text-nowrap"><a href={{ url_for("projects.get_overview", sort="mentor", year=current_year) }}>Mentor(s)</a></th>
                     </tr>
                 </thead>
                 <tbody>
                     {% if registration_data|length == 0 %}
-                        <td colspan="8">No data available!</td>
+                        <td colspan="9">No data available!</td>
                     {% else %}
                         {% for reg in registration_data %}
                             <tr>
                                 <td class="text-nowrap">{{ reg['student_name'] }}</td>
+                                <td class="text-nowrap">{{ reg['student_id'] }}</td>
                                 <td class="text-nowrap">
                                 {%  if reg['status'] == "Accepted" %}
                                     <button class="btn search-button-color" disabled>{{ reg['status'] }}</button>

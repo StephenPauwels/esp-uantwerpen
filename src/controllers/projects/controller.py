@@ -427,6 +427,7 @@ def process_registration_data(registrations):
 
         record = {
             'student_name': reg['student_name'],
+            'student_id': reg['student_id'],
             'status': reg['status'],
             'date': reg['date'],
             'type': reg['type'],
@@ -459,24 +460,26 @@ def get_csv_data():
 
         # Create header
         worksheet.write(0, 0, "Student Name")
-        worksheet.write(0, 1, "Status")
-        worksheet.write(0, 2, "Last Change")
-        worksheet.write(0, 3, "Type")
-        worksheet.write(0, 4, "Project")
-        worksheet.write(0, 5, "Promotor")
-        worksheet.write(0, 6, "Other Promotor(s)")
-        worksheet.write(0, 7, "Mentor(s)")
+        worksheet.write(0, 1, "Student ID")
+        worksheet.write(0, 2, "Status")
+        worksheet.write(0, 3, "Last Change")
+        worksheet.write(0, 4, "Type")
+        worksheet.write(0, 5, "Project")
+        worksheet.write(0, 6, "Promotor")
+        worksheet.write(0, 7, "Other Promotor(s)")
+        worksheet.write(0, 8, "Mentor(s)")
 
         row = 1
         for registration in data:
             worksheet.write(row, 0, registration['student_name'])
-            worksheet.write(row, 1, registration['status'])
-            worksheet.write(row, 2, registration['date'])
-            worksheet.write(row, 3, registration['type'])
-            worksheet.write(row, 4, registration['title'])
-            worksheet.write(row, 5, registration['promotor'])
-            worksheet.write(row, 6, registration['co-promotor'])
-            worksheet.write(row, 7, registration['mentor'])
+            worksheet.write(row, 1, registration['student_id'])
+            worksheet.write(row, 2, registration['status'])
+            worksheet.write(row, 3, registration['date'])
+            worksheet.write(row, 4, registration['type'])
+            worksheet.write(row, 5, registration['title'])
+            worksheet.write(row, 6, registration['promotor'])
+            worksheet.write(row, 7, registration['co-promotor'])
+            worksheet.write(row, 8, registration['mentor'])
             row += 1
 
         workbook.close()
@@ -491,11 +494,16 @@ def get_overview():
         return '<div class="title">Er ging iets mis bij het genereren van het rapport</div>'
     else:
         records = []
+        year = ""
 
         if 'year' in request.args and request.args['year'] != "":
-            registrations = RegistrationDataAccess(get_db()).get_csv_data([request.args['year']])
+            year = request.args['year']
+            registrations = RegistrationDataAccess(get_db()).get_csv_data([year])
 
             records = process_registration_data(registrations)
 
-        return render_template('overview.html', registration_data=records)
+        if 'sort' in request.args:
+            records = sorted(records, key=lambda l: l[request.args['sort']])
+
+        return render_template('overview.html', registration_data=records, current_year=year)
 
