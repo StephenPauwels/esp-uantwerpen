@@ -233,17 +233,32 @@ function init_supervisors_input(promotor) {
     //const supervisors_input = $("#supervisors input");
 
     // Initialize the tagsinput with autocomplete for employees
-    supervisors_input.tagsinput({
-        delimiter: '|',
-        tagClass: "badge employee-bg-color ",
-        typeahead: {
-            afterSelect: function (val) {
-                this.$element.val("");
+    if (promotor) {
+        supervisors_input.tagsinput({
+            delimiter: '|',
+            tagClass: "badge employee-bg-color ",
+            typeahead: {
+                afterSelect: function (val) {
+                    this.$element.val("");
+                },
+                source: list_source
             },
-            source: list_source
-        },
-        freeInput: false
-    });
+            freeInput: false,
+            maxTags: 1
+        });
+    } else {
+        supervisors_input.tagsinput({
+            delimiter: '|',
+            tagClass: "badge employee-bg-color ",
+            typeahead: {
+                afterSelect: function (val) {
+                    this.$element.val("");
+                },
+                source: list_source
+            },
+            freeInput: false
+        });
+    }
 
     // Add the employee to the project when item is added
     supervisors_input.on("itemAdded", function (event) {
@@ -251,12 +266,13 @@ function init_supervisors_input(promotor) {
 
         let guidance;
         if (id === "promotors-input") {
-            guidance = "Promotor"
+            guidance = "Promotor";
         } else if (id === "co-promotors-input") {
-            guidance = "Co-Promotor"
+            guidance = "Co-Promotor";
         } else {
-            guidance = "Mentor"
+            guidance = "Mentor";
         }
+
 
         for (const employee of project['employees']) {
             if (employee['guidance_type'] === guidance && employee['employee']['name'] === event.item) {
