@@ -459,9 +459,9 @@ def process_registration_data(registrations):
         project = project_acces.get_project(p_id, False)
         project_acces.minimize_project(project)
 
-        promotor = ",".join(project.employees.get("Promotor", ["-"]))
-        co_promotor = ",".join(project.employees.get("Co-Promotor", ["-"]))
-        mentor = ",".join(project.employees.get("Mentor", ["-"]))
+        promotor = ", ".join(project.employees.get("Promotor", ["-"]))
+        co_promotor = ", ".join(project.employees.get("Co-Promotor", ["-"]))
+        mentor = ", ".join(project.employees.get("Mentor", ["-"]))
 
         record = {
             'student_name': reg['student_name'],

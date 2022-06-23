@@ -26,9 +26,9 @@
 
         <div class="row">
         {% if current_theme == "dark" %}
-            <table class="table text-nowrap table-dark table-responsive" style="width:100%;margin-left:auto;margin-right:auto;">
+            <table class="table table-dark table-responsive" style="width:100%;margin-left:auto;margin-right:auto;">
         {% else %}
-            <table class="table text-nowrap table-responsive" style="width:100%;margin-left:auto;margin-right:auto;">
+            <table class="table table-responsive" style="width:100%;margin-left:auto;margin-right:auto;">
         {% endif %}
                 <thead>
                     <tr>
@@ -51,9 +51,9 @@
                     {% else %}
                         {% for reg in registration_data %}
                             <tr>
-                                <td>{{ reg['student_name'] }}</td>
-                                <td>{{ reg['student_id'] }}</td>
-                                <td>
+                                <td class="text-nowrap">{{ reg['student_name'] }}</td>
+                                <td class="text-nowrap">{{ reg['student_id'] }}</td>
+                                <td class="text-nowrap">
                                 {%  if reg['status'] == "Accepted" %}
                                     <button class="btn btn-success" disabled>{{ reg['status'] }}</button>
                                 {% elif reg['status'] == "Denied"  %}
@@ -62,10 +62,10 @@
                                     <button class="btn btn-warning" disabled>{{ reg['status'] }}</button>
                                 {% endif %}
                                 </td>
-                                <td>{{ reg['date'] }}</td>
-                                <td>{{ reg['type'] }}</td>
-                                <td><a href={{ url_for("projects.project_page", project_id=reg['project_id']) }}>{{ reg['title'] }}</a></td>
-                                <td>{{ reg['promotor'] }}</td>
+                                <td class="text-nowrap">{{ reg['date'] }}</td>
+                                <td class="text-nowrap"><span class="badge badge-primary" style="margin-right: 10px">{{ reg['type'] }}</span></td>
+                                <td style="min-width: 300px;"><a href={{ url_for("projects.project_page", project_id=reg['project_id']) }}>{{ reg['title'] }}</a></td>
+                                <td class="text-nowrap">{{ reg['promotor'] }}</td>
                                 <td>{{ reg['co-promotor'] }}</td>
                                 <td>{{ reg['mentor'] }}</td>
                             </tr>
