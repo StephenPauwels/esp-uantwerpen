@@ -156,8 +156,18 @@ function refreshContent(type = currentTab) {
             active = true;
         }
 
-        if (type === tab.EMPLOYEES || type == tab.PROMOTORS) {
-            let listItem = createListItem(i, list[i]["name"], active);
+        if (type === tab.EMPLOYEES) {
+            let tags = [];
+            console.log(list[i]);
+            if (list[i]["is_admin"]) tags.push("admin");
+            if (list[i]["is_promotor"]) tags.push("promotor");
+            let listItem = createListItem(i, list[i]["name"], active, tags);
+            make_popover(listItem.find("a")[0]);
+            populate_popover(listItem.find("a")[0], list[i]);
+            content.append(listItem);
+        }
+        else if (type === tab.PROMOTORS) {
+            let listItem = createListItem(i, list[i]["name"], active, false);
             make_popover(listItem.find("a")[0]);
             populate_popover(listItem.find("a")[0], list[i]);
             content.append(listItem);
@@ -870,7 +880,7 @@ function populate_popover(popover, employee) {
  * @param {string} text basic text for the list item
  * @return {boolean} active toggles the list items' activity status
  */
-function createListItem(integer, text, active) {
+function createListItem(integer, text, active, tags=null, editable=true) {
     if (! active) {
         text += "<span class=\"badge badge-info\" style='margin-left: 10px'>Non Active</span>"
     }
@@ -883,11 +893,24 @@ function createListItem(integer, text, active) {
     let item = `
     <li class="list-group-item d-flex justify-content-between align-items-center ${darkClasses}">
         <div class="col">
-            <a>${text}</a>
+            <a>${text}</a>`
+
+    if (tags) {
+        for (let i = 0; i < tags.length; i++) {
+            item += '<span class="badge badge-info" style="margin-left: 10px">' + tags[i] + '</span>'
+        }
+    }
+
+    item += `
         </div>
         <div style="display: inline-block;">
-            <div class="row">
-                <button class="btn bg-light btn-sm" type="button" id="edit-button${integer}"><span style="font-size: 20px;" onclick="onClickEditButton(${integer})"><b>&#9998;</b></span></button>
+            <div class="row">                
+    `;
+    if (editable) {
+        item += `<button class="btn bg-light btn-sm" type="button" id="edit-button${integer}"><span style="font-size: 20px;" onclick="onClickEditButton(${integer})"><b>&#9998;</b></span></button>`
+    }
+
+    item += `
                 <div class="custom-control form-control-lg custom-checkbox" style="display: inline-block; margin-left: 10px">
                         <input type="checkbox" class="custom-control-input" id="checkbox${integer}" onclick="onClickCheckbox()">
                         <label class="custom-control-label" for="checkbox${integer}"></label>
@@ -895,6 +918,7 @@ function createListItem(integer, text, active) {
             </div>
         </div>
     </li>`;
+
 
     return $(item);
 }
