@@ -158,7 +158,6 @@ function refreshContent(type = currentTab) {
 
         if (type === tab.EMPLOYEES) {
             let tags = [];
-            console.log(list[i]);
             if (list[i]["is_admin"]) tags.push("admin");
             if (list[i]["is_promotor"]) tags.push("promotor");
             let listItem = createListItem(i, list[i]["name"], active, tags);
@@ -167,7 +166,7 @@ function refreshContent(type = currentTab) {
             content.append(listItem);
         }
         else if (type === tab.PROMOTORS) {
-            let listItem = createListItem(i, list[i]["name"], active, false);
+            let listItem = createListItem(i, list[i]["name"], active, null,false);
             make_popover(listItem.find("a")[0]);
             populate_popover(listItem.find("a")[0], list[i]);
             content.append(listItem);
