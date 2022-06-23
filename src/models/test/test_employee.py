@@ -26,7 +26,7 @@ class TestEmployeeDataAccess(TestCase):
     def test_get_employee(self):
         connection = self._connect()
         dao = EmployeeDataAccess(dbconnect=connection)
-        object = dao.get_employee(1)
+        object = dao.get_employee('1')
         self.assertEqual('D Trump'.upper(),
                          object.name.upper())
         connection.close()
@@ -46,7 +46,8 @@ class TestEmployeeDataAccess(TestCase):
         connection.get_cursor().execute('DELETE from employee where name=\'test_ins\'')
         connection.get_connection().commit()
         dao = EmployeeDataAccess(dbconnect=connection)
-        obj = Employee(name='test_ins', e_id=2, email=None, extra_info=None, office=None, picture_location=None, research_group='Boos', title='PhD', is_active=True, is_intern=True)
+        obj = Employee(name='test_ins', employee_id=2, email=None, extra_info=None, office=None, picture_location=None,
+                       research_group='Boos', title='PhD', is_active=True, is_external=False, is_admin=False, is_promotor=False)
         dao.add_employee(obj)
         objects = dao.get_employees(True)
         self.assertEqual('test_ins'.upper(),
@@ -60,21 +61,22 @@ class TestEmployeeDataAccess(TestCase):
         connection.get_cursor().execute('DELETE from employee where name=\'test_ins\'')
         connection.get_connection().commit()
         dao = EmployeeDataAccess(dbconnect=connection)
-        obj = Employee(name='test_ins', e_id=None, email=None, extra_info=None, office=None, picture_location=None,
-                       research_group='Boos', title='PhD', is_active=True, is_intern=True)
+        obj = Employee(name='test_ins', employee_id=1000, email=None, extra_info=None, office=None, picture_location=None,
+                       research_group='Boos', title='PhD', is_active=True, is_external=True, is_admin=False, is_promotor=False)
         dao.add_employee(obj)
         objects = dao.get_employees(True)
         # print(objects[-1].to_dct())
         self.assertEqual('test_ins'.upper(),
                          objects[-1].name.upper())
-        self.assertEqual(True, objects[-1].is_intern)
+        self.assertEqual(True, objects[-1].is_external)
         self.assertEqual('PhD', objects[-1].title)
         self.assertEqual('Boos', objects[-1].research_group)
-        obj2 = Employee(name='test_ins', e_id=objects[-1].e_id, email=None, extra_info=None, office=None, picture_location=None,
-                       research_group='Konijn', title='Professor', is_active=True, is_intern=False)
+        self.assertEqual(False, objects[-1].is_promotor)
+        obj2 = Employee(name='test_ins', employee_id=objects[-1].e_id, email=None, extra_info=None, office=None, picture_location=None,
+                       research_group='Konijn', title='Professor', is_active=True, is_external=False, is_admin=False, is_promotor=False)
         dao.update_employee(obj2)
         objects = dao.get_employees(True)
-        self.assertEqual(False, objects[-1].is_intern)
+        self.assertEqual(False, objects[-1].is_external)
         self.assertEqual('Professor', objects[-1].title)
         self.assertEqual('Konijn', objects[-1].research_group)
         connection.get_cursor().execute('DELETE from employee where name=\'test_ins\'')
@@ -86,8 +88,8 @@ class TestEmployeeDataAccess(TestCase):
         connection.get_cursor().execute('DELETE from employee where name=\'test_ins\'')
         connection.get_connection().commit()
         dao = EmployeeDataAccess(dbconnect=connection)
-        obj = Employee(name='test_ins', e_id=None, email=None, extra_info=None, office=None, picture_location=None,
-                       research_group='Boos', title='PhD', is_active=True, is_intern=True)
+        obj = Employee(name='test_ins', employee_id=1000, email=None, extra_info=None, office=None, picture_location=None,
+                       research_group='Boos', title='PhD', is_active=True, is_external=False, is_admin=False, is_promotor=False)
         dao.add_employee(obj)
         objects = dao.get_employees(True)
         self.assertEqual('test_ins'.upper(),
@@ -105,8 +107,8 @@ class TestEmployeeDataAccess(TestCase):
         connection.get_cursor().execute('DELETE from employee where name=\'test_ins\'')
         connection.get_connection().commit()
         dao = EmployeeDataAccess(dbconnect=connection)
-        obj = Employee(name='test_ins', e_id=None, email=None, extra_info=None, office=None, picture_location=None,
-                       research_group='Boos', title='PhD', is_active=True, is_intern=True)
+        obj = Employee(name='test_ins', employee_id=1000, email=None, extra_info=None, office=None, picture_location=None,
+                       research_group='Boos', title='PhD', is_active=True, is_external=False, is_admin=False, is_promotor=False)
         dao.add_employee(obj)
         objects = dao.get_employees(True)
         self.assertEqual('test_ins'.upper(),
@@ -119,6 +121,27 @@ class TestEmployeeDataAccess(TestCase):
         connection.get_connection().commit()
         connection.close()
 
+    def test_set_promotor(self):
+        connection = self._connect()
+        connection.get_cursor().execute('DELETE from employee where name=\'test_ins\'')
+        connection.get_connection().commit()
+        dao = EmployeeDataAccess(dbconnect=connection)
+        obj = Employee(name='test_ins', employee_id=1000, email=None, extra_info=None, office=None, picture_location=None,
+                       research_group='Boos', title='PhD', is_active=True, is_external=False, is_admin=False, is_promotor=False)
+        dao.add_employee(obj)
+        objects = dao.get_employees(True)
+        self.assertEqual('test_ins'.upper(),
+                         objects[-1].name.upper())
+        self.assertEqual(False, objects[-1].is_promotor)
+        dao.set_promotor(objects[-1].e_id, True)
+        objects = dao.get_employees(True)
+        self.assertEqual('test_ins'.upper(),
+                         objects[-1].name.upper())
+        self.assertEqual(True, objects[-1].is_promotor)
+        connection.get_cursor().execute('DELETE from employee where name=\'test_ins\'')
+        connection.get_connection().commit()
+        connection.close()
+
     def test_domain_title(self):
         connection = self._connect()
         connection.get_cursor().execute('DELETE from Employee where name=\'test112\'')
@@ -127,17 +150,17 @@ class TestEmployeeDataAccess(TestCase):
 
         connection.get_connection().commit()
         dao = EmployeeDataAccess(dbconnect=connection)
-        obj1 = Employee(name='test112', email=None, office='GR23', extra_info=None, picture_location=None,
+        obj1 = Employee(employee_id=1000, name='test112', email=None, office='GR23', extra_info=None, picture_location=None,
                         research_group='Boos',
-                        title='Professor', is_intern=False, is_active=False, e_id=None)
+                        title='Professor', is_external=True, is_active=False, is_admin=False, is_promotor=False)
         dao.add_employee(obj1)
-        obj2 = Employee(name='test21', email=None, office='GR23', extra_info=None, picture_location=None,
+        obj2 = Employee(employee_id=1001, name='test21', email=None, office='GR23', extra_info=None, picture_location=None,
                         research_group='Boos',
-                        title='PhD', is_intern=False, is_active=True, e_id=None)
+                        title='PhD', is_external=True, is_active=True, is_admin=False, is_promotor=False)
         dao.add_employee(obj2)
-        obj3 = Employee(name='test113', email=None, office='GR23', extra_info=None, picture_location=None,
+        obj3 = Employee(employee_id=1002, name='test113', email=None, office='GR23', extra_info=None, picture_location=None,
                         research_group='Boos',
-                        title='Bakker', is_intern=False, is_active=None, e_id=None)
+                        title='Bakker', is_external=True, is_active=None, is_admin=False, is_promotor=False)
         with self.assertRaises(Exception) as context:
             dao.add_employee(obj3)
         self.assertTrue('' in str(context.exception),

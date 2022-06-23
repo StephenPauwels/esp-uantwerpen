@@ -119,6 +119,27 @@ class ProjectDataAccess:
 
         return projects
 
+    def get_projects_from_promotor(self, promotor_id, details=False):
+        projects = list()
+        for project_id in self.get_project_ids(False):
+            p = self.get_project(project_id, False)
+            for emp in p.employees:
+                if emp.guidance_type == "Promotor" and emp.employee.e_id.lower() == promotor_id.lower():
+                    if not details:
+                        self.minimize_project(p)
+
+                    projects.append(p)
+
+        return projects
+
+    def is_promotor(self, project_id, promotor_id):
+        p = self.get_project(project_id, False)
+        for emp in p.employees:
+            if emp.guidance_type == "Promotor" and emp.employee.e_id.lower() == promotor_id.lower():
+                return True
+        return False
+
+
     @staticmethod
     def minimize_project(project):
         """Remove tags and cut the html to 400 chars"""

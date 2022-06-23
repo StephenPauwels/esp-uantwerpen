@@ -3,7 +3,7 @@ let PROJECTS = null;
 let TYPES = [];
 let EMPLOYEES = [];
 let GROUPS = [];
-
+let PROMOTORS = [];
 
 // Enum used in the function addEditEntry
 const ENTRY_TYPE = {ADD_EMPLOYEE: 1, REMOVE_EMPLOYEE: 2, TAG: 3, TYPE: 4};
@@ -38,6 +38,7 @@ $(function () {
             EMPLOYEES = result["employees"];
             TYPES = result["types"];
             GROUPS = result["groups"];
+            PROMOTORS = result["promotors"];
             init_type_select();
             init_research_select();
             init_employee_filter();

@@ -82,8 +82,7 @@ function createEditEntry(type) {
     if (type === ENTRY_TYPE.ADD_EMPLOYEE) {
         className = "employee-entry";
         middleColumn = `
-            <select class="form-control">
-                <option value="Promotor">Promotor</option>
+            <select id="employee-type" class="form-control">
                 <option value="Co-Promotor">Co-Promotor</option>
                 <option value="Mentor">Mentor</option>
             </select>`;
@@ -253,6 +252,7 @@ function sendEditingChanges(projects) {
         });
     }
 
+    /*
     let activeStatus = $("#active-status-selector").val();
     if (activeStatus !== "Don't change" && activeStatus !== "Verander niet") {
         json.entries.push({
@@ -260,6 +260,7 @@ function sendEditingChanges(projects) {
             active: activeStatus === "Active" || activeStatus === "Actief"
         });
     }
+    */
 
     // Send the data
     $.ajax({
@@ -974,7 +975,7 @@ let PROJECTS = null;
 let TYPES = [];
 let EMPLOYEES = [];
 let GROUPS = [];
-
+let PROMOTORS = [];
 
 // Enum used in the function addEditEntry
 const ENTRY_TYPE = {ADD_EMPLOYEE: 1, REMOVE_EMPLOYEE: 2, TAG: 3, TYPE: 4};
@@ -1009,6 +1010,7 @@ $(function () {
             EMPLOYEES = result["employees"];
             TYPES = result["types"];
             GROUPS = result["groups"];
+            PROMOTORS = result["promotors"];
             init_type_select();
             init_research_select();
             init_employee_filter();

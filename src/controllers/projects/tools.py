@@ -6,6 +6,9 @@ from src.models import ProjectDataAccess, EmployeeDataAccess, GuideDataAccess, G
     AttachmentDataAccess, TagDataAccess, Attachment, TypeDataAccess, Type, Document, Project
 from src.models.db import get_db
 from flask import jsonify
+from flask_login import current_user
+
+from src.utils.mail import send_mail
 
 
 def project_editor(data):
@@ -32,23 +35,46 @@ def project_editor(data):
     title = data['title']
     group = data['research_group']
     max_students = data['max_students']
-    is_active = data['is_active']
+    is_active = False # Default to False
 
+    prev_promotor = None
     if new_project:
         project = Project(None, title, max_students, document_id, group, is_active, None, 0, False)
         project = project_access.add_project(project)
         p_id = project.project_id
     else:
         p_id = data['project_id']
+        project = project_access.get_project(p_id, False)
+        # Check if promotor did activation of project
+        if current_user.is_authenticated and project_access.is_promotor(p_id, current_user.user_id):
+            is_active = data['is_active']
+        else:
+            is_active = project.is_active
         project_access.update_project(p_id, title, max_students, group, is_active)
+        prev_promotor = guide_access.get_promotor_for_project(p_id)
         guide_access.remove_project_guides(p_id)
 
+    # When multiple promotors are used, only first employee who is promotor is selected
     promotors = data['promotors']
     for promotor in promotors:
         if promotor != "":
-            employee_id = employee_access.get_employee_by_name(promotor).e_id
-            guide = Guide(employee_id, p_id, "Promotor")
-            guide_access.add_guide(guide)
+            employee = employee_access.get_employee_by_name(promotor)
+            # Extra check that promotor is valid
+            if employee.is_promotor:
+                guide = Guide(employee.e_id, p_id, "Promotor")
+                guide_access.add_guide(guide)
+                promotor_email = employee.email
+
+                # Send message to Promotor
+                if new_project:
+                    msg = "A new project (\"%s\") has been added. Please visit the ESP website to activate this project." % (project.title)
+                    send_mail(promotor_email, "ESP Project Added", msg)
+                elif not prev_promotor or prev_promotor[0] != employee.e_id:
+                    msg = "A change to project \"%s\" has been made and the project is currently not active. Please visit the ESP website to activate this project" % (project.title)
+                    # If promotor is changed -> is_active is set to False
+                    project_access.update_project(p_id, title, max_students, group, False)
+                    send_mail(promotor_email, "ESP Project Updated", msg)
+                break
 
     copromotorlist = data['co-promotors']
     for copromotor in copromotorlist:

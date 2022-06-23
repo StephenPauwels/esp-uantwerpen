@@ -1,0 +1,79 @@
+{% extends "layout.html" %}
+
+{% block title %}Projects overview{% endblock %}
+
+{% block head %}
+    <script src='{{ url_for('static', filename='js/overview.js') }}' type="text/javascript" xmlns=""></script>
+{% endblock %}
+
+{% block content %}
+
+
+    <div class="container">
+        <p>
+            <div class="row">
+                <form class="form-inline col-auto w-100 p-0">
+                    <select id="yearOverview" title="Registration year"
+                    style="width: 90%; margin-bottom: 2px !important;"></select>
+
+                    <button form="" autofocus class="btn search-button-color" id="generate" type="submit"
+                            style="margin-left: 2% !important; margin-bottom: 2px !important;">
+                        {{ get_text("Generate") }}
+                    </button>
+                </form>
+            </div>
+        </p>
+
+        <div class="row">
+        {% if current_theme == "dark" %}
+            <table class="table text-nowrap table-dark table-responsive" style="width:100%;margin-left:auto;margin-right:auto;">
+        {% else %}
+            <table class="table text-nowrap table-responsive" style="width:100%;margin-left:auto;margin-right:auto;">
+        {% endif %}
+                <thead>
+                    <tr>
+                        <th><a href={{ url_for("projects.get_overview", sort="student_name", year=current_year) }}>Student Name</a></th>
+                        <th><a href={{ url_for("projects.get_overview", sort="student_id", year=current_year) }}>Student ID</a></th>
+                        <th><a href={{ url_for("projects.get_overview", sort="status", year=current_year) }}>Status</a></th>
+                        <th><a href={{ url_for("projects.get_overview", sort="date", year=current_year) }}>Last Change</a></th>
+                        <th><a href={{ url_for("projects.get_overview", sort="type", year=current_year) }}>Type</a></th>
+                        <th><a href={{ url_for("projects.get_overview", sort="title", year=current_year) }}>Project</a></th>
+                        <th><a href={{ url_for("projects.get_overview", sort="promotor", year=current_year) }}>Promotor</a></th>
+                        <th><a href={{ url_for("projects.get_overview", sort="co-promotor", year=current_year) }}>Other Promotor(s)</a></th>
+                        <th><a href={{ url_for("projects.get_overview", sort="mentor", year=current_year) }}>Mentor(s)</a></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% if current_year == "" %}
+                        <td colspan="9">No year selected!</td>
+                    {% elif registration_data|length == 0%}
+                        <td colspan="9">No data available!</td>
+                    {% else %}
+                        {% for reg in registration_data %}
+                            <tr>
+                                <td>{{ reg['student_name'] }}</td>
+                                <td>{{ reg['student_id'] }}</td>
+                                <td>
+                                {%  if reg['status'] == "Accepted" %}
+                                    <button class="btn btn-success" disabled>{{ reg['status'] }}</button>
+                                {% elif reg['status'] == "Denied"  %}
+                                    <button class="btn btn-danger" disabled>{{ reg['status'] }}</button>
+                                {% else %}
+                                    <button class="btn btn-warning" disabled>{{ reg['status'] }}</button>
+                                {% endif %}
+                                </td>
+                                <td>{{ reg['date'] }}</td>
+                                <td>{{ reg['type'] }}</td>
+                                <td><a href={{ url_for("projects.project_page", project_id=reg['project_id']) }}>{{ reg['title'] }}</a></td>
+                                <td>{{ reg['promotor'] }}</td>
+                                <td>{{ reg['co-promotor'] }}</td>
+                                <td>{{ reg['mentor'] }}</td>
+                            </tr>
+                        {% endfor %}
+                    {% endif %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+{% endblock %}

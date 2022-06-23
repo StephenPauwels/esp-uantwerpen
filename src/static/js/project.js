@@ -4,9 +4,11 @@
 let project;
 let research_group;
 let links;
+let is_promotor;
 let groups;
 let types;
 let employees;
+let promotors;
 
 
 // Dropzone configuration
@@ -106,7 +108,7 @@ function new_project() {
         html_content_nl: "Een fantastisch project idee is ontstaan",
         attachments: [],
         max_students: 1,
-        is_active: true
+        is_active: false
     };
     $("#modify-btn").show();
     $("#title").text("Project Title");
@@ -122,10 +124,12 @@ function fetch_additional_data(callback) {
         url: "projects-page-additional",
         success: function (result) {
             employees = result["employees"];
+            promotors = result["promotors"];
             types = result["types"];
             groups = result["groups"];
 
-            init_supervisors_input();
+            init_supervisors_input(true);
+            init_supervisors_input(false);
             init_selectpickers();
 
             if (callback) {
@@ -167,8 +171,11 @@ function init_description_toggle() {
  */
 function init_tag_generator() {
     $('#generate-tags-btn').click(function() {
-        let title = CKEDITOR.instances.title.getData();
-        let both_descriptions = CKEDITOR.instances.description.getData();
+        //console.log(CKEDITOR.instances);
+        //let title = CKEDITOR.instances.title.getData();
+        //let both_descriptions = CKEDITOR.instances.description.getData();
+        let both_descriptions = "";
+        let title = project["title"]
         const english = $("#description-toggle").prop('checked');
         if (english) {
             both_descriptions += " " + project['html_content_nl'];
@@ -213,8 +220,17 @@ function init_selectpickers() {
 /**
  * This function initializes the supervisor input.
  */
-function init_supervisors_input() {
-    const supervisors_input = $("#supervisors input");
+function init_supervisors_input(promotor) {
+    let supervisors_input;
+    let list_source;
+    if (promotor) {
+        supervisors_input = $("#promotors input");
+        list_source = promotors;
+    } else {
+        supervisors_input = $("#co-promotors input, #mentors input");
+        list_source = employees;
+    }
+    //const supervisors_input = $("#supervisors input");
 
     // Initialize the tagsinput with autocomplete for employees
     supervisors_input.tagsinput({
@@ -224,7 +240,7 @@ function init_supervisors_input() {
             afterSelect: function (val) {
                 this.$element.val("");
             },
-            source: employees
+            source: list_source
         },
         freeInput: false
     });
@@ -273,6 +289,7 @@ function fetch_project() {
             project = data["project_data"];
             research_group = data["research_group"];
             links = data["links"];
+            is_promotor = data["promotor"]
 
             construct_project();
             construct_description();
@@ -302,6 +319,12 @@ function refresh_active_button() {
     } else {
         active_btn.attr("class", "btn my-2 btn-danger");
         active_btn.text("Inactive");
+    }
+
+    if (is_promotor) {
+        active_btn.prop('disabled', false);
+    } else {
+        active_btn.prop('disabled', true);
     }
 }
 
@@ -1078,7 +1101,6 @@ function getEditHTML() {
                 </div>
                 <div class="col">
                     <select style='width: 100%; max-width: 150px;' id="guidance-input">
-                        <option value="Promotor">Promotor</option>
                         <option value="Co-Promotor">Co-Promotor</option>
                         <option value="Mentor">Mentor</option>
                     </select>                

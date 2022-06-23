@@ -93,7 +93,7 @@ def new_person(user_id, password):
         office = person['physicalDeliveryOfficeName'].value
         picture = get_random_picture_location()
 
-        employee = Employee(user_id, name, email, office, None, picture, None, None, False, False, True)
+        employee = Employee(user_id, name, email, office, None, picture, None, None, False, False, True, False)
         EmployeeDataAccess(get_db()).add_employee(employee)
         return User(user_id, name, 'employee', True)
 

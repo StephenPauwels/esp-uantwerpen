@@ -38,9 +38,18 @@ def get_projects_with_recommendations():
 
     project_access = ProjectDataAccess(get_db())
     active_only = not session.get("archive", False)
-    all_projects = [obj.to_dict() for obj in project_access.get_projects(active_only)]
+    if current_user.is_authenticated and current_user.role == "admin":
+        all_projects = project_access.get_projects(False)
+    else:
+        all_projects = project_access.get_projects(active_only)
+        if current_user.is_authenticated and current_user.role == "employee":
+            all_projects = [obj for obj in project_access.get_projects_from_promotor(current_user.user_id, False)
+                            if obj.project_id not in [o.project_id for o in all_projects]] + all_projects
 
-    max_views = project_access.get_most_viewed_projects(1, active_only)[0].view_count
+    all_projects = [obj.to_dict() for obj in all_projects]
+
+    most_viewed = project_access.get_most_viewed_projects(1, active_only)
+    max_views = most_viewed[0].view_count if len(most_viewed) > 0 else 0
     oldest, newest = project_access.get_oldest_and_newest()
     oldest = oldest.timestamp()
     biggest_difference = newest.timestamp() - oldest

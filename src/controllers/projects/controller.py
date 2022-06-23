@@ -69,12 +69,14 @@ def get_projects_page_additional_data():
 
     all_types = TypeDataAccess(connection).get_types(active_only)
     employees = EmployeeDataAccess(connection).get_employees(active_only)
+    promotors = EmployeeDataAccess(connection).get_promotors(active_only)
     groups = ResearchGroupDataAccess(connection).get_group_names(active_only)
 
     result = {
         "types": [obj.type_name for obj in all_types],
         "employees": [obj.name for obj in employees],
-        "groups": groups
+        "groups": groups,
+        "promotors": [obj.name for obj in promotors]
     }
     return jsonify(result)
 
@@ -269,6 +271,7 @@ def get_all_project_data(p_id):
     active_only = not session["archive"]
     project_access = ProjectDataAccess(get_db())
     p_data = project_access.get_project(p_id, active_only)
+    is_promotor = project_access.is_promotor(p_id, current_user.user_id)
 
     if current_user.is_authenticated and current_user.role == "student":
         p_data.liked = LikeDataAccess(get_db()).is_liked(p_data.project_id, current_user.user_id)
@@ -287,11 +290,12 @@ def get_all_project_data(p_id):
     # Fill linked projects list with most viewed projects
     if len(linked_projects_data) < 4:
         projects_most_views = project_access.get_most_viewed_projects(8, active_only)
-        i = 0
-        while len(linked_projects_data) < 4:
-            if not projects_most_views[i].project_id == p_id:
-                linked_projects_data.add(projects_most_views[i])
-            i += 1
+        if len(projects_most_views) >= 4:
+            i = 0
+            while len(linked_projects_data) < 4:
+                if not projects_most_views[i].project_id == p_id:
+                    linked_projects_data.add(projects_most_views[i])
+                i += 1
 
     try:
         research_group = ResearchGroupDataAccess(get_db()).get_research_group(p_data.research_group).to_dict()
@@ -299,7 +303,7 @@ def get_all_project_data(p_id):
         research_group = None
 
     return jsonify({"project_data": p_data.to_dict(), "research_group": research_group,
-                    "links": [obj.to_dict() for obj in linked_projects_data]})
+                    "links": [obj.to_dict() for obj in linked_projects_data], "promotor": is_promotor})
 
 
 @bp.route('/save-attachment', methods=['POST'])
@@ -407,6 +411,36 @@ def update_recommendations(p1_id, p2_id, amount):
         return ""
 
 
+def process_registration_data(registrations):
+    project_acces = ProjectDataAccess(get_db())
+
+    records = list()
+
+    for reg in registrations:
+        p_id = reg["project_id"]
+        project = project_acces.get_project(p_id, False)
+        project_acces.minimize_project(project)
+
+        promotor = ",".join(project.employees.get("Promotor", ["-"]))
+        co_promotor = ",".join(project.employees.get("Co-Promotor", ["-"]))
+        mentor = ",".join(project.employees.get("Mentor", ["-"]))
+
+        record = {
+            'student_name': reg['student_name'],
+            'student_id': reg['student_id'],
+            'status': reg['status'],
+            'date': reg['date'],
+            'type': reg['type'],
+            'title': project.title,
+            'project_id': project.project_id,
+            'promotor': promotor,
+            'co-promotor': co_promotor,
+            'mentor': mentor
+        }
+        records.append(record)
+    return records
+
+
 @bp.route('/csv-data')
 def get_csv_data():
     """
@@ -418,24 +452,63 @@ def get_csv_data():
     else:
         years = request.args['years']
         years = years.split()
-        data = RegistrationDataAccess(get_db()).get_csv_data(years)
+        registrations = RegistrationDataAccess(get_db()).get_csv_data(years)
+        data = process_registration_data(registrations)
 
         file = os.path.join(config_data['file-storage'], 'Registrations.xlsx')
         workbook = xlsxwriter.Workbook(file)
         worksheet = workbook.add_worksheet()
 
-        row = 0
+        # Create header
+        worksheet.write(0, 0, "Student Name")
+        worksheet.write(0, 1, "Student ID")
+        worksheet.write(0, 2, "Status")
+        worksheet.write(0, 3, "Last Change")
+        worksheet.write(0, 4, "Type")
+        worksheet.write(0, 5, "Project")
+        worksheet.write(0, 6, "Promotor")
+        worksheet.write(0, 7, "Other Promotor(s)")
+        worksheet.write(0, 8, "Mentor(s)")
+
+        row = 1
         for registration in data:
             worksheet.write(row, 0, registration['student_name'])
-            worksheet.write(row, 1, registration['status'])
-            worksheet.write(row, 2, registration['date'])
-            worksheet.write(row, 3, registration['type'])
-            worksheet.write(row, 4, registration['title'])
-            worksheet.write(row, 5, registration['employee_name'])
+            worksheet.write(row, 1, registration['student_id'])
+            worksheet.write(row, 2, registration['status'])
+            worksheet.write(row, 3, registration['date'])
+            worksheet.write(row, 4, registration['type'])
+            worksheet.write(row, 5, registration['title'])
+            worksheet.write(row, 6, registration['promotor'])
+            worksheet.write(row, 7, registration['co-promotor'])
+            worksheet.write(row, 8, registration['mentor'])
             row += 1
 
         workbook.close()
 
         filename = 'Registrations_' + datetime.today().strftime('%d-%m-%Y') + '.xlsx'
         return send_file(file, attachment_filename=filename, as_attachment=True)
+
+
+@bp.route('/overview')
+def get_overview():
+    if not current_user.is_authenticated or (current_user.role != "admin" and current_user.role != "employee"):
+        return '<div class="title">Er ging iets mis bij het genereren van het rapport</div>'
+    else:
+        records = []
+        year = ""
+
+        if 'year' in request.args and request.args['year'] != "":
+            year = request.args['year']
+            registrations = RegistrationDataAccess(get_db()).get_csv_data([year])
+
+            records = process_registration_data(registrations)
+
+        if 'sort' in request.args:
+            if request.args['sort'] == "date":
+                from datetime import datetime
+                records = sorted(records, key=lambda l: datetime.strptime(l['date'], "%d/%m/%Y"), reverse=True)
+            else:
+                records = sorted(records, key=lambda l: l[request.args['sort']])
+
+        return render_template('overview.html', registration_data=records, current_year=year)
 

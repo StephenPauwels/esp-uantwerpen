@@ -39,12 +39,14 @@ def get_all_list_data():
     all_tags = TagDataAccess(conn).get_tags()
     all_groups = ResearchGroupDataAccess(conn).get_research_groups(False)
     all_employees = EmployeeDataAccess(conn).get_employees(False)
+    all_promotors = EmployeeDataAccess(conn).get_promotors(False)
 
     result = {
         "types": [obj.to_dict() for obj in all_types],
         "tags": all_tags,
         "research groups": [obj.to_dict() for obj in all_groups],
-        "employees": [obj.to_dict() for obj in all_employees]
+        "employees": [obj.to_dict() for obj in all_employees],
+        "promotors": [obj.to_dict() for obj in all_promotors]
     }
 
     return jsonify(result)

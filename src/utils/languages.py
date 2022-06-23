@@ -419,6 +419,14 @@ language_dict = {
     "project-csv": {
         "en": "Download Report",
         "nl": "Download Rapport"
+    },
+    "Overview": {
+        "en": "Overview",
+        "nl": "Overzicht"
+    },
+    "Generate": {
+        "en": "Generate overview",
+        "nl": "Genereer overzicht"
     }
 }
 
