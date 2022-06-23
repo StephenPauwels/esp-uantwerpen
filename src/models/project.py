@@ -352,6 +352,7 @@ class ProjectDataAccess:
     def copy_project(self, project_id, new_doc_id):
         project = self.get_project(project_id, False)
         project.description_id = new_doc_id
+        project.is_active = False
         return self.add_project(project).project_id
 
     def add_view_count(self, project_id, amount):
