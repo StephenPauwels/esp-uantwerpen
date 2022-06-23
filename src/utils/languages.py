@@ -427,6 +427,10 @@ language_dict = {
     "Generate": {
         "en": "Generate overview",
         "nl": "Genereer overzicht"
+    },
+    "Copy selected": {
+        "en": "Copy Projects",
+        "nl": "Kopiëer Projecten"
     }
 }
 

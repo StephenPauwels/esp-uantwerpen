@@ -8,7 +8,7 @@ from flask import render_template, Blueprint, request, jsonify, session, current
 from src.controllers.projects.manage_projects import manage
 from src.models import TypeDataAccess, ProjectDataAccess, EmployeeDataAccess, ResearchGroupDataAccess, \
     GuideDataAccess, Like, Registration, RegistrationDataAccess, LikeDataAccess, \
-    LinkDataAccess, ClickDataAccess
+    LinkDataAccess, ClickDataAccess, DocumentDataAccess
 from src.models.db import get_db
 from datetime import datetime
 import os
@@ -47,6 +47,44 @@ def projects():
                            'ContentType': 'application/json'}
 
         return manage(data)
+
+
+@bp.route('/copy-projects', methods=["POST"])
+def copy_projects():
+    if not current_user.is_authenticated or (current_user.role != "admin" and current_user.role != "employee"):
+        return jsonify(
+            {'success': False, "message": "You are not authorized to edit the selected projects"}), 400, {
+
+                   'ContentType': 'application/json'}
+    data = request.json
+
+    document_access = DocumentDataAccess(get_db())
+    project_access = ProjectDataAccess(get_db())
+    guide_access = GuideDataAccess(get_db())
+    for p_id in data["projects"]:
+        project = project_access.get_project(p_id, False)
+
+        # Copy description
+        doc_id = document_access.copy_document(project.description_id)
+
+        # Copy project info
+        new_id = project_access.copy_project(p_id, doc_id)
+
+        # Copy employee info
+        guides = guide_access.get_guides_for_project(p_id)
+        for guide in guides:
+            guide.project = new_id
+            guide_access.add_guide(guide)
+
+        # Copy type info
+        for p_type in project.types:
+            project_access.add_type(new_id, p_type)
+
+        # Copy tag info
+        for p_tag in project.tags:
+            project_access.add_project_tag(new_id, p_tag)
+
+    return jsonify({'success': True}), 200, {'ContentType': 'application/json'}
 
 
 @bp.route('/get-all-projects-data', methods=['GET'])

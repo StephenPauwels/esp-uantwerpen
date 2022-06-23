@@ -172,6 +172,9 @@ function filter_employee(projects_filter_prev) {
     var project_added;
     for (var i = 0; i < projects_filter_prev.length; i++) {
         project_added = false;
+                        if (projects_filter_prev[i]["project_id"] == 244) {
+                    console.log(projects_filter_prev[i]);
+                }
         if (projects_filter_prev[i]["employees"]["Promotor"]) {
             for (var j = 0; j < projects_filter_prev[i]["employees"]["Promotor"].length; j++) {
                 if (projects_filter_prev[i]["employees"]["Promotor"][j] === promotor_text) {

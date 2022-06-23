@@ -119,6 +119,13 @@ class ProjectDataAccess:
 
         return projects
 
+    def get_document_id(self, project_id):
+        cursor = self.dbconnect.get_cursor()
+
+        cursor.execute('SELECT description_id FROM project WHERE project_id=%s', (project_id,))
+        row = cursor.fetchone()
+        return row[0]
+
     def get_projects_from_promotor(self, promotor_id, details=False):
         projects = list()
         for project_id in self.get_project_ids(False):
@@ -341,6 +348,11 @@ class ProjectDataAccess:
         except:
             self.dbconnect.rollback()
             raise
+
+    def copy_project(self, project_id, new_doc_id):
+        project = self.get_project(project_id, False)
+        project.description_id = new_doc_id
+        return self.add_project(project).project_id
 
     def add_view_count(self, project_id, amount):
         """

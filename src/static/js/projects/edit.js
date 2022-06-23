@@ -279,6 +279,25 @@ function sendEditingChanges(projects) {
     });
 }
 
+function sendCopy(projects) {
+    let json = {
+        projects: projects,
+        entries: []
+    };
+
+    // Send the data
+    $.ajax({
+        url: "copy-projects",
+        type: "POST",
+        data: JSON.stringify(json),
+        contentType: 'application/json',
+        success: function () {
+            setLoading(true);
+            refreshProjectsData();
+        }
+    });
+}
+
 
 
 /**

@@ -279,6 +279,25 @@ function sendEditingChanges(projects) {
     });
 }
 
+function sendCopy(projects) {
+    let json = {
+        projects: projects,
+        entries: []
+    };
+
+    // Send the data
+    $.ajax({
+        url: "copy-projects",
+        type: "POST",
+        data: JSON.stringify(json),
+        contentType: 'application/json',
+        success: function () {
+            setLoading(true);
+            refreshProjectsData();
+        }
+    });
+}
+
 
 
 /**
@@ -495,6 +514,9 @@ function filter_employee(projects_filter_prev) {
     var project_added;
     for (var i = 0; i < projects_filter_prev.length; i++) {
         project_added = false;
+                        if (projects_filter_prev[i]["project_id"] == 244) {
+                    console.log(projects_filter_prev[i]);
+                }
         if (projects_filter_prev[i]["employees"]["Promotor"]) {
             for (var j = 0; j < projects_filter_prev[i]["employees"]["Promotor"].length; j++) {
                 if (projects_filter_prev[i]["employees"]["Promotor"][j] === promotor_text) {
@@ -1037,6 +1059,7 @@ window.addEventListener('popstate', function (event) {
  */
 function setupButtons() {
     let editModalButton = $("#editModalButton");
+    let copyButton = $("#copyProjects");
     let selectAllButton = $("#selectAllButton");
     let showDescriptionsButton = $("#showDescriptionsButton");
 
@@ -1051,6 +1074,16 @@ function setupButtons() {
             sendEditingChanges(checkedProjects);
         });
     });
+
+    copyButton.click(function() {
+        let checkedProjects = getCheckedProjects();
+
+        sendCopy(checkedProjects);
+
+        let allCheckBoxes = $(".custom-control-input");
+        allCheckBoxes.prop('checked', false);
+    })
+
     selectAllButton.click(function () {
         let allCheckBoxes = $(".custom-control-input");
 
@@ -1087,11 +1120,13 @@ function setupButtons() {
 
     if (inEditMode()) {
         editModalButton.show();
+        copyButton.show();
         selectAllButton.show();
         setProjectsPerPage(1000);
     } else {
         selectAllButton.hide();
         editModalButton.hide();
+        copyButton.hide();
     }
 }
 

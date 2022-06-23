@@ -100,3 +100,8 @@ class DocumentDataAccess:
                        'WHERE document_id=%s', (document_id,))
         row = cursor.fetchone()
         return Document(row[0], row[1], row[2])
+
+    def copy_document(self, document_id):
+        doc = self.get_document(document_id)
+        return self.add_document(doc).document_id
+

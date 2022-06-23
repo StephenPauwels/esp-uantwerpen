@@ -65,6 +65,7 @@ window.addEventListener('popstate', function (event) {
  */
 function setupButtons() {
     let editModalButton = $("#editModalButton");
+    let copyButton = $("#copyProjects");
     let selectAllButton = $("#selectAllButton");
     let showDescriptionsButton = $("#showDescriptionsButton");
 
@@ -79,6 +80,16 @@ function setupButtons() {
             sendEditingChanges(checkedProjects);
         });
     });
+
+    copyButton.click(function() {
+        let checkedProjects = getCheckedProjects();
+
+        sendCopy(checkedProjects);
+
+        let allCheckBoxes = $(".custom-control-input");
+        allCheckBoxes.prop('checked', false);
+    })
+
     selectAllButton.click(function () {
         let allCheckBoxes = $(".custom-control-input");
 
@@ -115,11 +126,13 @@ function setupButtons() {
 
     if (inEditMode()) {
         editModalButton.show();
+        copyButton.show();
         selectAllButton.show();
         setProjectsPerPage(1000);
     } else {
         selectAllButton.hide();
         editModalButton.hide();
+        copyButton.hide();
     }
 }
 
