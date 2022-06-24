@@ -97,6 +97,7 @@ function setupButtons() {
 
     deleteButton.click(function() {
         let checkedProjects = getCheckedProjects();
+
         if (checkedProjects.length > 0) {
             if (confirm("Are you sure you want to delete " + checkedProjects.length + " projects?")) {
                 sendDelete(checkedProjects);

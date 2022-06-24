@@ -112,14 +112,14 @@ def remove_project():
 
             # Only remove projects without student registrations
             if len(project.registrations) == 0:
+                # Delete project
+                project_access.remove_project(p_id)
+
                 # Delete description
                 document_access.remove_document(project.description_id)
 
                 # Delete guides info
                 guide_access.remove_project_guides(p_id)
-
-                # Delete project
-                project_access.remove_project(p_id)
 
     return jsonify({'success': True}), 200, {'ContentType': 'application/json'}
 
