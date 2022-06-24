@@ -431,6 +431,10 @@ language_dict = {
     "Copy": {
         "en": "Copy",
         "nl": "Kopiëer"
+    },
+    "Delete": {
+        "en": "Delete",
+        "nl": "Verwijder"
     }
 }
 

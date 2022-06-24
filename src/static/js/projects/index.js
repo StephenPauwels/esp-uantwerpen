@@ -85,7 +85,7 @@ function setupButtons() {
     copyButton.click(function() {
         let checkedProjects = getCheckedProjects();
 
-        if (confirm("Are you sure you want to copy ${checkedProjects.length} projects?")) {
+        if (confirm("Are you sure you want to copy " + checkedProjects.length + " projects?")) {
             sendCopy(checkedProjects);
 
             let allCheckBoxes = $(".custom-control-input");
@@ -96,7 +96,7 @@ function setupButtons() {
     deleteButton.click(function() {
         let checkedProjects = getCheckedProjects();
 
-        if (confirm("Are you sure you want to delete ${checkedProjects.length} projects?")) {
+        if (confirm("Are you sure you want to delete " + checkedProjects.length + " projects?")) {
             sendDelete(checkedProjects);
 
             let allCheckBoxes = $(".custom-control-input");
