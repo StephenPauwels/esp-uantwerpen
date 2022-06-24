@@ -51,6 +51,9 @@ def projects():
 
 @bp.route('/copy-projects', methods=["POST"])
 def copy_projects():
+    """
+    Handles the POST request to copy projects
+    """
     if not current_user.is_authenticated or (current_user.role != "admin" and current_user.role != "employee"):
         return jsonify(
             {'success': False, "message": "You are not authorized to edit the selected projects"}), 400, {
@@ -83,6 +86,40 @@ def copy_projects():
         # Copy tag info
         for p_tag in project.tags:
             project_access.add_project_tag(new_id, p_tag)
+
+    return jsonify({'success': True}), 200, {'ContentType': 'application/json'}
+
+
+@bp.route('/delete-projects', methods=["POST"])
+def remove_project():
+    """
+    Handles the POST request to remove projects without student registrations
+    """
+    if not current_user.is_authenticated or (current_user.role != "admin" and current_user.role != "employee"):
+        return jsonify(
+            {'success': False, "message": "You are not authorized to remove the selected projects"}), 400, {
+
+                   'ContentType': 'application/json'}
+
+    data = request.json
+
+    document_access = DocumentDataAccess(get_db())
+    project_access = ProjectDataAccess(get_db())
+    guide_access = GuideDataAccess(get_db())
+    for p_id in data["projects"]:
+        if project_access.is_promotor(p_id, current_user.user_id) or current_user.role == "admin":
+            project = project_access.get_project(p_id, False)
+
+            # Only remove projects without student registrations
+            if len(project.registrations) == 0:
+                # Delete description
+                document_access.remove_document(project.description_id)
+
+                # Delete guides info
+                guide_access.remove_project_guides(p_id)
+
+                # Delete project
+                project_access.remove_project(p_id)
 
     return jsonify({'success': True}), 200, {'ContentType': 'application/json'}
 
@@ -453,6 +490,11 @@ def update_recommendations(p1_id, p2_id, amount):
 
 
 def process_registration_data(registrations):
+    """
+    Converts the registration data to be used in the overviews
+    :param registrations: List of registrations retrieved from RegistartionDataAccess
+    :return: List with records in a format to use within the overviews
+    """
     project_acces = ProjectDataAccess(get_db())
 
     records = list()
@@ -532,6 +574,9 @@ def get_csv_data():
 
 @bp.route('/overview')
 def get_overview():
+    """
+    Handles the GET request to /overview, which shows data about all project registrations for certain years
+    """
     if not current_user.is_authenticated or (current_user.role != "admin" and current_user.role != "employee"):
         return '<div class="title">Er ging iets mis bij het genereren van het rapport</div>'
     else:

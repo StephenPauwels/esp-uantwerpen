@@ -66,6 +66,7 @@ window.addEventListener('popstate', function (event) {
 function setupButtons() {
     let editModalButton = $("#editModalButton");
     let copyButton = $("#copyProjects");
+    let deleteButton = $("#deleteProjects");
     let selectAllButton = $("#selectAllButton");
     let showDescriptionsButton = $("#showDescriptionsButton");
 
@@ -84,10 +85,23 @@ function setupButtons() {
     copyButton.click(function() {
         let checkedProjects = getCheckedProjects();
 
-        sendCopy(checkedProjects);
+        if (confirm("Are you sure you want to copy ${checkedProjects.length} projects?")) {
+            sendCopy(checkedProjects);
 
-        let allCheckBoxes = $(".custom-control-input");
-        allCheckBoxes.prop('checked', false);
+            let allCheckBoxes = $(".custom-control-input");
+            allCheckBoxes.prop('checked', false);
+        }
+    })
+
+    deleteButton.click(function() {
+        let checkedProjects = getCheckedProjects();
+
+        if (confirm("Are you sure you want to delete ${checkedProjects.length} projects?")) {
+            sendDelete(checkedProjects);
+
+            let allCheckBoxes = $(".custom-control-input");
+            allCheckBoxes.prop('checked', false);
+        }
     })
 
     selectAllButton.click(function () {
@@ -127,12 +141,14 @@ function setupButtons() {
     if (inEditMode()) {
         editModalButton.show();
         copyButton.show();
+        deleteButton.show();
         selectAllButton.show();
         setProjectsPerPage(1000);
     } else {
         selectAllButton.hide();
         editModalButton.hide();
         copyButton.hide();
+        deleteButton.hide();
     }
 }
 

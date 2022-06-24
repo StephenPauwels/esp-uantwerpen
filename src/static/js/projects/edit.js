@@ -298,6 +298,24 @@ function sendCopy(projects) {
     });
 }
 
+function sendDelete(projects) {
+    let json = {
+        projects: projects,
+        entries: []
+    };
+
+    // Send the data
+    $.ajax({
+        url: "delete-projects",
+        type: "POST",
+        data: JSON.stringify(json),
+        contentType: 'application/json',
+        success: function () {
+            setLoading(true);
+            refreshProjectsData();
+        }
+    });
+}
 
 
 /**

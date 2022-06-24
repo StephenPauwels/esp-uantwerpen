@@ -102,6 +102,24 @@ class DocumentDataAccess:
         return Document(row[0], row[1], row[2])
 
     def copy_document(self, document_id):
+        """
+        Create a copy of a given document
+        :param document_id: The ID of the document to copy
+        :return: The ID of the new (copied) document
+        """
         doc = self.get_document(document_id)
         return self.add_document(doc).document_id
+
+    def remove_document(self, document_id):
+        """
+        Remove a given document
+        :param document_id: The ID of the document to remove
+        """
+        cursor = self.dbconnect.get_cursor()
+        try:
+            cursor.execute('DELETE FROM document WHERE document_id = %s' % (document_id))
+            self.dbconnect.commit()
+        except:
+            self.dbconnect.rollback()
+            raise
 

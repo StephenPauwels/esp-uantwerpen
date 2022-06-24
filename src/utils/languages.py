@@ -428,9 +428,9 @@ language_dict = {
         "en": "Generate overview",
         "nl": "Genereer overzicht"
     },
-    "Copy selected": {
-        "en": "Copy Projects",
-        "nl": "Kopiëer Projecten"
+    "Copy": {
+        "en": "Copy",
+        "nl": "Kopiëer"
     }
 }
 

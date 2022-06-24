@@ -120,6 +120,11 @@ class ProjectDataAccess:
         return projects
 
     def get_document_id(self, project_id):
+        """
+        Return the ID of the project description
+        :param project_id: The project to get the description ID from
+        :return: The description ID of the project
+        """
         cursor = self.dbconnect.get_cursor()
 
         cursor.execute('SELECT description_id FROM project WHERE project_id=%s', (project_id,))
@@ -127,6 +132,12 @@ class ProjectDataAccess:
         return row[0]
 
     def get_projects_from_promotor(self, promotor_id, details=False):
+        """
+        Get all projects associated with a given promotor
+        :param promotor_id: The promotor to get the projects from
+        :param details: When set to False, apply minimize_project on the projects
+        :return: List with all projects
+        """
         projects = list()
         for project_id in self.get_project_ids(False):
             p = self.get_project(project_id, False)
@@ -140,6 +151,12 @@ class ProjectDataAccess:
         return projects
 
     def is_promotor(self, project_id, promotor_id):
+        """
+        Check if given promotor_id is promotor of projects
+        :param project_id: The project to check
+        :param promotor_id: Check if this promotor is promotor of the project
+        :return: True if promotor_id is promotor of project
+        """
         p = self.get_project(project_id, False)
         for emp in p.employees:
             if emp.guidance_type == "Promotor" and emp.employee.e_id.lower() == promotor_id.lower():
@@ -350,6 +367,13 @@ class ProjectDataAccess:
             raise
 
     def copy_project(self, project_id, new_doc_id):
+        """
+        Copy a project
+        :param project_id: The project to copy
+        :param new_doc_id: The document_id to link with the copied project
+        :return: The ID from the new (copied) project
+        :raise: Exception if the database has to roll back
+        """
         project = self.get_project(project_id, False)
         project.description_id = new_doc_id
         project.is_active = False
@@ -587,3 +611,19 @@ class ProjectDataAccess:
     #     except:
     #         self.dbconnect.rollback()
     #         raise
+
+    def remove_project(self, project_id):
+        """
+        Removes the project (including tags and types) from the database.
+        :param project_id: The project to remove
+        :raise: Exception if the database has to roll back.
+        """
+        self.remove_tags(project_id)
+        self.remove_types(project_id)
+
+        cursor = self.dbconnect.get_cursor()
+        try:
+            cursor.execute('DELETE FROM project WHERE project_id = %s' % project_id)
+        except:
+            self.dbconnect.rollback()
+            raise
