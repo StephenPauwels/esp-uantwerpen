@@ -324,13 +324,13 @@ language_dict = {
         "en": "Dark Theme",
         "nl": "Donker Thema"
     },
-    "Show Archive": {
-        "en": "Show Archive",
-        "nl": "Toon Archief"
+    "Show Inactive": {
+        "en": "Show Inactive",
+        "nl": "Toon Inactief"
     },
-    "Hide Archive": {
-        "en": "Hide Archive",
-        "nl": "Verberg Archief"
+    "Hide Inactive": {
+        "en": "Hide Inactive",
+        "nl": "Verberg Inactief"
     },
     "Cookie notification": {
         "en": "This website would like to use cookies",

@@ -493,6 +493,11 @@ function save_project(description_warning=true, type_warning=true) {
         return;
     }
 
+    if (!project['promotors'].length) {
+        $("#error").show().text("No promotor selected");
+        return;
+    }
+
     let active_types = type_still_active(project['types']);
     if(active_types.length > 0 && type_warning){
         console.log("in ")

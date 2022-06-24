@@ -111,10 +111,10 @@
                     {% if current_user.is_authenticated and (current_user.role == "employee" or current_user.role == "admin") %}
                         {% if not archive_active %}
                             <a class="dropdown-item"
-                               href="{{ request.script_root + get_args() + "&archive=true" }}">{{ get_text("Show Archive") }}</a>
+                               href="{{ request.script_root + get_args() + "&archive=true" }}">{{ get_text("Show Inactive") }}</a>
                         {% else %}
                             <a class="dropdown-item"
-                               href="{{ request.script_root + get_args() + "&archive=false" }}">{{ get_text("Hide Archive") }}</a>
+                               href="{{ request.script_root + get_args() + "&archive=false" }}">{{ get_text("Hide Inactive") }}</a>
                         {% endif %}
                     {% endif %}
 
@@ -124,10 +124,10 @@
                         <a class="dropdown-item"
                            href="{{ url_for("projects.projects") + "?edit=true" }}">{{ get_text("Projects") }}</a>
                         <a class="dropdown-item" href="#" id="my-profile">{{ get_text("My Profile") }}</a>
-                        <a class="dropdown-item" href="{{ url_for("projects.get_overview") }}">{{ get_text("Overview") }}</a>
-                        <a class="dropdown-item" href="#" id="my-csv">{{ get_text("project-csv") }}</a>
 
                         {% if current_user.role == "admin" %}
+                            <a class="dropdown-item" href="{{ url_for("projects.get_overview") }}">{{ get_text("Overview") }}</a>
+                            <a class="dropdown-item" href="#" id="my-csv">{{ get_text("project-csv") }}</a>
                             <a class="dropdown-item"
                                href="{{ url_for("manage_lists.modify_lists") }}">{{ get_text("Supporting Lists") }}</a>
                             <a class="dropdown-item" href="{{ url_for("mails.admin_mail") }}" id="extension-confirmation">Admin Mails</a>
