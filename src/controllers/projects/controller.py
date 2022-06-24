@@ -309,7 +309,10 @@ def get_all_project_data(p_id):
     active_only = not session["archive"]
     project_access = ProjectDataAccess(get_db())
     p_data = project_access.get_project(p_id, active_only)
-    is_promotor = project_access.is_promotor(p_id, current_user.user_id)
+    if current_user.is_authenticated:
+        is_promotor = project_access.is_promotor(p_id, current_user.user_id)
+    else:
+        is_promotor = False
 
     if current_user.is_authenticated and current_user.role == "student":
         p_data.liked = LikeDataAccess(get_db()).is_liked(p_data.project_id, current_user.user_id)
