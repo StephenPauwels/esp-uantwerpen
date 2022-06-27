@@ -35,7 +35,7 @@ def project_editor(data):
     title = data['title']
     group = data['research_group']
     max_students = data['max_students']
-    is_active = False # Default to False
+    is_active = data['is_active']
 
     prev_promotor = None
     if new_project:
@@ -45,11 +45,6 @@ def project_editor(data):
     else:
         p_id = data['project_id']
         project = project_access.get_project(p_id, False)
-        # Check if promotor did activation of project
-        if current_user.is_authenticated and project_access.is_promotor(p_id, current_user.user_id):
-            is_active = data['is_active']
-        else:
-            is_active = project.is_active
         project_access.update_project(p_id, title, max_students, group, is_active)
         prev_promotor = guide_access.get_promotor_for_project(p_id)
         guide_access.remove_project_guides(p_id)
@@ -65,15 +60,16 @@ def project_editor(data):
                 guide_access.add_guide(guide)
                 promotor_email = employee.email
 
-                # Send message to Promotor
-                if new_project:
-                    msg = "A new project (\"%s\") has been added. Please visit the ESP website to activate this project." % (project.title)
-                    send_mail(promotor_email, "ESP Project Added", msg)
-                elif not prev_promotor or prev_promotor[0] != employee.e_id:
-                    msg = "A change to project \"%s\" has been made and the project is currently not active. Please visit the ESP website to activate this project" % (project.title)
-                    # If promotor is changed -> is_active is set to False
-                    project_access.update_project(p_id, title, max_students, group, False)
-                    send_mail(promotor_email, "ESP Project Updated", msg)
+                # Send message if project is still inactive
+                if not is_active:
+                    if new_project:
+                        msg = "A new project (\"%s\") has been added with you as promotor. Please visit the ESP website to activate this project." % (project.title)
+                        send_mail(promotor_email, "ESP Project Added", msg)
+                    elif not prev_promotor or prev_promotor[0] != employee.e_id:
+                        msg = "A change to project \"%s\" has been made (you have been selected as the promotor) and the project is currently not active. Please visit the ESP website to activate this project" % (project.title)
+                        # If promotor is changed -> is_active is set to False
+                        project_access.update_project(p_id, title, max_students, group, False)
+                        send_mail(promotor_email, "ESP Project Updated", msg)
                 break
 
     copromotorlist = data['co-promotors']

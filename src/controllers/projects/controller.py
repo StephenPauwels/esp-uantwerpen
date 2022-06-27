@@ -49,21 +49,33 @@ def projects():
         return manage(data)
 
 
+@bp.route('/my-projects', methods=["GET", "POST"])
+def my_projects():
+    return projects()
+
+
 @bp.route('/copy-projects', methods=["POST"])
 def copy_projects():
     """
     Handles the POST request to copy projects
     """
+    data = request.json
+
     if not current_user.is_authenticated or (current_user.role != "admin" and current_user.role != "employee"):
         return jsonify(
             {'success': False, "message": "You are not authorized to edit the selected projects"}), 400, {
-
                    'ContentType': 'application/json'}
-    data = request.json
+
+    for p_id in data["projects"]:
+        if current_user.role != "admin" and not employee_authorized_for_project(current_user.name, p_id):
+            return jsonify(
+                {'success': False, "message": "You are not authorized to edit the selected projects"}), 400, {
+                       'ContentType': 'application/json'}
 
     document_access = DocumentDataAccess(get_db())
     project_access = ProjectDataAccess(get_db())
     guide_access = GuideDataAccess(get_db())
+
     for p_id in data["projects"]:
         project = project_access.get_project(p_id, False)
 
@@ -95,31 +107,37 @@ def remove_project():
     """
     Handles the POST request to remove projects without student registrations
     """
+    data = request.json
+
     if not current_user.is_authenticated or (current_user.role != "admin" and current_user.role != "employee"):
         return jsonify(
             {'success': False, "message": "You are not authorized to remove the selected projects"}), 400, {
 
                    'ContentType': 'application/json'}
 
-    data = request.json
+    for p_id in data["projects"]:
+        if current_user.role != "admin" and not employee_authorized_for_project(current_user.name, p_id):
+            return jsonify(
+                {'success': False, "message": "You are not authorized to remove the selected projects"}), 400, {
+                       'ContentType': 'application/json'}
 
     document_access = DocumentDataAccess(get_db())
     project_access = ProjectDataAccess(get_db())
     guide_access = GuideDataAccess(get_db())
+
     for p_id in data["projects"]:
-        if project_access.is_promotor(p_id, current_user.user_id) or current_user.role == "admin":
-            project = project_access.get_project(p_id, False)
+        project = project_access.get_project(p_id, False)
 
-            # Only remove projects without student registrations
-            if len(project.registrations) == 0:
-                # Delete project
-                project_access.remove_project(p_id)
+        # Only remove projects without student registrations
+        if len(project.registrations) == 0:
+            # Delete project
+            project_access.remove_project(p_id)
 
-                # Delete description
-                document_access.remove_document(project.description_id)
+            # Delete description
+            document_access.remove_document(project.description_id)
 
-                # Delete guides info
-                guide_access.remove_project_guides(p_id)
+            # Delete guides info
+            guide_access.remove_project_guides(p_id)
 
     return jsonify({'success': True}), 200, {'ContentType': 'application/json'}
 

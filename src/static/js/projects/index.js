@@ -32,6 +32,9 @@ $(function () {
         refreshProjectsData(restoreScrollingPosition);
     }
 
+    $("#success").hide();
+    $("#error").hide();
+
     $.ajax({
         url: "projects-page-additional",
         success: function (result) {
@@ -88,9 +91,6 @@ function setupButtons() {
         if (checkedProjects.length > 0) {
             if (confirm("Are you sure you want to copy " + checkedProjects.length + " projects?")) {
                 sendCopy(checkedProjects);
-
-                let allCheckBoxes = $(".custom-control-input");
-                allCheckBoxes.prop('checked', false);
             }
         }
     })
@@ -101,9 +101,6 @@ function setupButtons() {
         if (checkedProjects.length > 0) {
             if (confirm("Are you sure you want to delete " + checkedProjects.length + " projects?")) {
                 sendDelete(checkedProjects);
-
-                let allCheckBoxes = $(".custom-control-input");
-                allCheckBoxes.prop('checked', false);
             }
         }
     })

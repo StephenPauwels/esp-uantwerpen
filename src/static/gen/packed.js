@@ -294,10 +294,50 @@ function sendCopy(projects) {
         success: function () {
             setLoading(true);
             refreshProjectsData();
+            $("#success").text("Projects succesfully copied")
+            $("#success").show();
+            $("#error").hide();
+
+            let allCheckBoxes = $(".custom-control-input");
+            allCheckBoxes.prop('checked', false);
+        },
+        error: function(message) {
+            $("#error").text("Error occurred during copying: " + message["responseJSON"]["message"]);
+            $("#error").show();
+            $("#success").hide();
         }
     });
 }
 
+function sendDelete(projects) {
+    let json = {
+        projects: projects,
+        entries: []
+    };
+
+    // Send the data
+    $.ajax({
+        url: "delete-projects",
+        type: "POST",
+        data: JSON.stringify(json),
+        contentType: 'application/json',
+        success: function () {
+            setLoading(true);
+            refreshProjectsData();
+            $("#success").text("Projects succesfully deleted")
+            $("#success").show();
+            $("#error").hide();
+
+            let allCheckBoxes = $(".custom-control-input");
+            allCheckBoxes.prop('checked', false);
+        },
+        error: function(message) {
+            $("#error").text("Error occurred during removing: " + message["responseJSON"]["message"]);
+            $("#error").show();
+            $("#success").hide();
+        }
+    });
+}
 
 
 /**
@@ -305,6 +345,9 @@ function sendCopy(projects) {
  * @return {boolean}
  */
 function inEditMode() {
+    if (role === 'admin') {
+        return true;
+    }
     let urlParam = parseURLParams(window.location.href)['edit'];
     if (urlParam) {
         return urlParam[0] === "true";
@@ -1026,6 +1069,9 @@ $(function () {
         refreshProjectsData(restoreScrollingPosition);
     }
 
+    $("#success").hide();
+    $("#error").hide();
+
     $.ajax({
         url: "projects-page-additional",
         success: function (result) {
@@ -1060,6 +1106,7 @@ window.addEventListener('popstate', function (event) {
 function setupButtons() {
     let editModalButton = $("#editModalButton");
     let copyButton = $("#copyProjects");
+    let deleteButton = $("#deleteProjects");
     let selectAllButton = $("#selectAllButton");
     let showDescriptionsButton = $("#showDescriptionsButton");
 
@@ -1078,10 +1125,21 @@ function setupButtons() {
     copyButton.click(function() {
         let checkedProjects = getCheckedProjects();
 
-        sendCopy(checkedProjects);
+        if (checkedProjects.length > 0) {
+            if (confirm("Are you sure you want to copy " + checkedProjects.length + " projects?")) {
+                sendCopy(checkedProjects);
+            }
+        }
+    })
 
-        let allCheckBoxes = $(".custom-control-input");
-        allCheckBoxes.prop('checked', false);
+    deleteButton.click(function() {
+        let checkedProjects = getCheckedProjects();
+
+        if (checkedProjects.length > 0) {
+            if (confirm("Are you sure you want to delete " + checkedProjects.length + " projects?")) {
+                sendDelete(checkedProjects);
+            }
+        }
     })
 
     selectAllButton.click(function () {
@@ -1121,12 +1179,14 @@ function setupButtons() {
     if (inEditMode()) {
         editModalButton.show();
         copyButton.show();
+        deleteButton.show();
         selectAllButton.show();
         setProjectsPerPage(1000);
     } else {
         selectAllButton.hide();
         editModalButton.hide();
         copyButton.hide();
+        deleteButton.hide();
     }
 }
 

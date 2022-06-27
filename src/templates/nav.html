@@ -53,7 +53,7 @@
 
                 {% if current_user.is_authenticated and current_user.role != "student" %}
                     <li class="nav-item">
-                        <a class="nav-link" href="{{ url_for("projects.projects") + '?employee=' + current_user.name }}">{{ get_text("My Projects") }}</a>
+                        <a class="nav-link" href="{{ url_for("projects.my_projects", employee=current_user.name, edit="true") }}">{{ get_text("My Projects") }}</a>
                     </li>
                 {% endif %}
 
@@ -121,8 +121,6 @@
                     {% if current_user.is_authenticated and (current_user.role == "admin" or current_user.role == "employee") %}
                         <hr>
                         <span class="dropdown-item" style="color: grey; font-size: 14px">{{ get_text("Manage") }}</span>
-                        <a class="dropdown-item"
-                           href="{{ url_for("projects.projects") + "?edit=true" }}">{{ get_text("Projects") }}</a>
                         <a class="dropdown-item" href="#" id="my-profile">{{ get_text("My Profile") }}</a>
 
                         {% if current_user.role == "admin" %}

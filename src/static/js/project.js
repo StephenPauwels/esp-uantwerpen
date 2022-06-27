@@ -40,7 +40,7 @@ Dropzone.options.dropzone = {
  */
 $(function () {
 
-    init_description_toggle();
+    // init_description_toggle();
     init_tag_generator();
 
     $("#external-employee-btn").click(addModal);
@@ -226,6 +226,24 @@ function init_supervisors_input(promotor) {
     if (promotor) {
         supervisors_input = $("#promotors input");
         list_source = promotors;
+
+        supervisors_input.on('itemAdded', function(event) {
+            if (name === event.item) {
+                is_promotor = true;
+            } else {
+                is_promotor = false;
+            }
+            refresh_active_button();
+        });
+        supervisors_input.on('beforeItemRemove', function(event) {
+            if (confirm("Removing the promotor will automatically set the project to inactive. Are you sure you want to continue?")) {
+                project["is_active"] = false;
+                is_promotor = false;
+            } else {
+                event.cancel = true;
+            }
+            refresh_active_button();
+        });
     } else {
         supervisors_input = $("#co-promotors input, #mentors input");
         list_source = employees;
@@ -241,7 +259,10 @@ function init_supervisors_input(promotor) {
                 afterSelect: function (val) {
                     this.$element.val("");
                 },
-                source: list_source
+                minLength: 0,
+                source: list_source,
+                showHintOnFocus: true,
+                autoSelect: false
             },
             freeInput: false,
             maxTags: 1
@@ -435,40 +456,27 @@ function type_still_active(types){
  * @param {boolean} description_warning toggles the description warnings
  * @param {boolean} type_warning toggles the project type warning
  */
-function save_project(description_warning=true, type_warning=true) {
+function save_project(description_warning=true, type_warning=true, active_warning=true) {
     project["title"] =  $('#title').text();
 
-    let current_description = CKEDITOR.instances["description"].getData();
+    let description = CKEDITOR.instances["description"].getData();
 
-    const english = $("#description-toggle").prop('checked');
-    if (english) {
-        project["html_content_eng"] = current_description
+    if (description == "") {
+         project["html_content_eng"] = "No description given";
     } else {
-        project["html_content_nl"] = current_description
+        project["html_content_eng"] = description;
     }
 
-    const dutch_too_short = !project['html_content_nl'] || project['html_content_nl'].length < 50;
     const english_too_short = !project['html_content_eng'] || project['html_content_eng'].length < 50;
 
-    if (dutch_too_short && english_too_short) {
-        $("#error").show().text("A description has to contain at least 50 characters, both of yours are less");
-        return;
-    }
-
-    if (dutch_too_short) {
-        project['html_content_nl'] = "";
-    } else if (english_too_short) {
-        project['html_content_eng'] = "";
-    }
-
-    if ((dutch_too_short || english_too_short) && description_warning) {
+    if (english_too_short && description_warning) {
         const confirm_button = $(`<button class="btn btn-outline-success ml-2">Yes</button>`)
             .click(function () {
                 save_project(false)});
 
         $("#error")
             .show()
-            .text(`Your ${dutch_too_short ? "dutch": "english"} description has less than 50 characters and won't be saved, are you sure you want to continue?`)
+            .text(`Your description has less than 50 characters and won't be saved, are you sure you want to continue?`)
             .append(confirm_button);
         return;
     }
@@ -521,6 +529,19 @@ function save_project(description_warning=true, type_warning=true) {
 
     if (!project['promotors'].length && !project['co-promotors'].length && !project['mentors'].length) {
         $("#error").show().text("Add at least one guide");
+        return;
+    }
+
+    if (!project['is_active'] && active_warning) {
+        const confirm_button = $(`<button class="btn btn-outline-success ml-2">Yes</button>`)
+            .click(function () {
+                save_project(description_warning,type_warning, active_warning=false)});
+
+        $("#error")
+            .show()
+            .text(`Your project is currently inactive, only the promotor can change the status to active. If you are not 
+            the promotor, the promotor will be notified. Are you sure you want to continue`)
+            .append(confirm_button);
         return;
     }
 
@@ -714,16 +735,7 @@ function fill_register_dropdown() {
  */
 function construct_description() {
     let description = document.getElementById("description");
-    const toggle = $("#description-toggle");
-
-    if ((language === 'nl' && project['html_content_nl']) ||
-        (language === 'en' && !project['html_content_eng'])) {
-        description.innerHTML = project['html_content_nl'];
-        toggle.bootstrapToggle("off");
-    } else {
-        description.innerHTML = project['html_content_eng'];
-        toggle.bootstrapToggle("on");
-    }
+    description.innerHTML = project['html_content_eng'];
 }
 
 /**

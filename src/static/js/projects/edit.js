@@ -294,6 +294,17 @@ function sendCopy(projects) {
         success: function () {
             setLoading(true);
             refreshProjectsData();
+            $("#success").text("Projects succesfully copied")
+            $("#success").show();
+            $("#error").hide();
+
+            let allCheckBoxes = $(".custom-control-input");
+            allCheckBoxes.prop('checked', false);
+        },
+        error: function(message) {
+            $("#error").text("Error occurred during copying: " + message["responseJSON"]["message"]);
+            $("#error").show();
+            $("#success").hide();
         }
     });
 }
@@ -313,6 +324,17 @@ function sendDelete(projects) {
         success: function () {
             setLoading(true);
             refreshProjectsData();
+            $("#success").text("Projects succesfully deleted")
+            $("#success").show();
+            $("#error").hide();
+
+            let allCheckBoxes = $(".custom-control-input");
+            allCheckBoxes.prop('checked', false);
+        },
+        error: function(message) {
+            $("#error").text("Error occurred during removing: " + message["responseJSON"]["message"]);
+            $("#error").show();
+            $("#success").hide();
         }
     });
 }
@@ -323,6 +345,9 @@ function sendDelete(projects) {
  * @return {boolean}
  */
 function inEditMode() {
+    if (role === 'admin') {
+        return true;
+    }
     let urlParam = parseURLParams(window.location.href)['edit'];
     if (urlParam) {
         return urlParam[0] === "true";
