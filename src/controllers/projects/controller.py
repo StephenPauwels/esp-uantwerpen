@@ -66,18 +66,19 @@ def copy_projects():
             {'success': False, "message": "You are not authorized to edit the selected projects"}), 400, {
                    'ContentType': 'application/json'}
 
-    for p_id in data["projects"]:
-        if current_user.role != "admin" and not employee_authorized_for_project(current_user.name, p_id):
-            return jsonify(
-                {'success': False, "message": "You are not authorized to edit the selected projects"}), 400, {
-                       'ContentType': 'application/json'}
-
     document_access = DocumentDataAccess(get_db())
     project_access = ProjectDataAccess(get_db())
     guide_access = GuideDataAccess(get_db())
 
+    success = []
+    errors = []
+
     for p_id in data["projects"]:
         project = project_access.get_project(p_id, False)
+
+        if current_user.role != "admin" and not employee_authorized_for_project(current_user.name, p_id):
+            errors.append("%s: You are not authorized to copy this project" % project.title)
+            continue
 
         # Copy description
         doc_id = document_access.copy_document(project.description_id)
@@ -99,7 +100,14 @@ def copy_projects():
         for p_tag in project.tags:
             project_access.add_project_tag(new_id, p_tag)
 
-    return jsonify({'success': True}), 200, {'ContentType': 'application/json'}
+        success.append("%s: Successfully copied" % project.title)
+
+    if len(errors) == 0:
+        return jsonify({'success': True, "message": "<br>".join(success)}), 200, {'ContentType': 'application/json'}
+    else:
+        return jsonify(
+            {'success': False, "message": "<br>".join(errors) + "<br><br>" + "<br>".join(success)}), 400, {
+                   'ContentType': 'application/json'}
 
 
 @bp.route('/delete-projects', methods=["POST"])
@@ -112,21 +120,21 @@ def remove_project():
     if not current_user.is_authenticated or (current_user.role != "admin" and current_user.role != "employee"):
         return jsonify(
             {'success': False, "message": "You are not authorized to remove the selected projects"}), 400, {
-
                    'ContentType': 'application/json'}
-
-    for p_id in data["projects"]:
-        if current_user.role != "admin" and not employee_authorized_for_project(current_user.name, p_id):
-            return jsonify(
-                {'success': False, "message": "You are not authorized to remove the selected projects"}), 400, {
-                       'ContentType': 'application/json'}
 
     document_access = DocumentDataAccess(get_db())
     project_access = ProjectDataAccess(get_db())
     guide_access = GuideDataAccess(get_db())
 
+    success = []
+    errors = []
+
     for p_id in data["projects"]:
         project = project_access.get_project(p_id, False)
+
+        if current_user.role != "admin" and not employee_authorized_for_project(current_user.name, p_id):
+            errors.append("%s: You are not authorized to remove this project" % project.title)
+            continue
 
         # Only remove projects without student registrations
         if len(project.registrations) == 0:
@@ -138,8 +146,16 @@ def remove_project():
 
             # Delete guides info
             guide_access.remove_project_guides(p_id)
+            success.append("%s: Successfully removed" % project.title)
+        else:
+            errors.append("%s: Cannot remove (student registrations are not empty)" % project.title)
 
-    return jsonify({'success': True}), 200, {'ContentType': 'application/json'}
+    if len(errors) == 0:
+        return jsonify({'success': True, "message": "<br>".join(success)}), 200, {'ContentType': 'application/json'}
+    else:
+        return jsonify(
+            {'success': False, "message": "<br>".join(errors) + "<br><br>" + "<br>".join(success)}), 400, {
+                   'ContentType': 'application/json'}
 
 
 @bp.route('/get-all-projects-data', methods=['GET'])

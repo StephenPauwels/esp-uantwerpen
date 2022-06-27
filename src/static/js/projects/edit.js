@@ -291,20 +291,25 @@ function sendCopy(projects) {
         type: "POST",
         data: JSON.stringify(json),
         contentType: 'application/json',
-        success: function () {
-            setLoading(true);
-            refreshProjectsData();
-            $("#success").text("Projects succesfully copied")
+        success: function (message) {
+            $("#success").html(message["message"])
             $("#success").show();
             $("#error").hide();
+            setLoading(true);
+            refreshProjectsData();
 
             let allCheckBoxes = $(".custom-control-input");
-            allCheckBoxes.prop('checked', false);
+            allCheckBoxes.prop('checked', false)
         },
         error: function(message) {
-            $("#error").text("Error occurred during copying: " + message["responseJSON"]["message"]);
+            $("#error").html(message["responseJSON"]["message"]);
             $("#error").show();
             $("#success").hide();
+            setLoading(true);
+            refreshProjectsData();
+
+            let allCheckBoxes = $(".custom-control-input");
+            allCheckBoxes.prop('checked', false)
         }
     });
 }
@@ -321,20 +326,25 @@ function sendDelete(projects) {
         type: "POST",
         data: JSON.stringify(json),
         contentType: 'application/json',
-        success: function () {
-            setLoading(true);
-            refreshProjectsData();
-            $("#success").text("Projects succesfully deleted")
+        success: function (message) {
+            $("#success").html(message["message"])
             $("#success").show();
             $("#error").hide();
+            setLoading(true);
+            refreshProjectsData();
 
             let allCheckBoxes = $(".custom-control-input");
-            allCheckBoxes.prop('checked', false);
+            allCheckBoxes.prop('checked', false)
         },
         error: function(message) {
-            $("#error").text("Error occurred during removing: " + message["responseJSON"]["message"]);
+            $("#error").html(message["responseJSON"]["message"]);
             $("#error").show();
             $("#success").hide();
+            setLoading(true);
+            refreshProjectsData();
+
+            let allCheckBoxes = $(".custom-control-input");
+            allCheckBoxes.prop('checked', false)
         }
     });
 }
