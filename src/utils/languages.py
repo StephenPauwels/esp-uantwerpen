@@ -435,6 +435,14 @@ language_dict = {
     "Delete": {
         "en": "Delete",
         "nl": "Verwijder"
+    },
+    "Bulk Edit": {
+        "en": "Bulk Edit",
+        "nl": "Bulk Edit"
+    },
+    "All Projects": {
+        "en": "All Projects",
+        "nl": "Alle Projecten"
     }
 }
 

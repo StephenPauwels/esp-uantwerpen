@@ -23,7 +23,7 @@ bp = Blueprint('projects', __name__)
 
 
 @bp.route('/projects', methods=["GET", "POST"])
-def projects():
+def projects(my_projects=False):
     """
     Handles the GET & POST request to '/projects'.
     GET: requests to render page
@@ -31,7 +31,7 @@ def projects():
     :return: render projects page / Json containing authorisation error / manage(data) function call
     """
     if request.method == "GET":
-        return render_template('projects.html')
+        return render_template('projects.html', my_projects=my_projects)
     else:
         if not current_user.is_authenticated or (current_user.role != "admin" and current_user.role != "employee"):
             return jsonify(
@@ -51,7 +51,7 @@ def projects():
 
 @bp.route('/my-projects', methods=["GET", "POST"])
 def my_projects():
-    return projects()
+    return projects(True)
 
 
 @bp.route('/copy-projects', methods=["POST"])
@@ -137,7 +137,14 @@ def remove_project():
             continue
 
         # Only remove projects without student registrations
-        if len(project.registrations) == 0:
+        registration_present = False
+        if len(project.registrations) > 0:
+            for reg in project.registrations:
+                if reg['status'] == "Pending" or reg['status'] == "Accepted":
+                    registration_present = True
+                    break
+
+        if not registration_present:
             # Delete project
             project_access.remove_project(p_id)
 

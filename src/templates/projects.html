@@ -1,6 +1,10 @@
 {% extends "layout.html" %}
 
+{% if not my_projects %}
 {% set nav_projects = "active" %}
+{% else %}
+{% set nav_myprojects = "active" %}
+{% endif %}
 
 {% block title %}Projects{% endblock %}
 
@@ -63,7 +67,7 @@
 
                 <button type="button" class="btn light-button-color" id="editModalButton" data-toggle="modal"
                         data-target="#editModal">
-                    {{ get_text("Edit") }}
+                    {{ get_text("Bulk Edit") }}
                 </button>
 
                 <button type="button" class="btn light-button-color" id="copyProjects">

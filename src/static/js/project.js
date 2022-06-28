@@ -262,7 +262,8 @@ function init_supervisors_input(promotor) {
                 minLength: 0,
                 source: list_source,
                 showHintOnFocus: true,
-                autoSelect: false
+                autoSelect: false,
+                items: 'all'
             },
             freeInput: false,
             maxTags: 1
