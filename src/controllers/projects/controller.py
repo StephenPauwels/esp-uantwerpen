@@ -309,8 +309,7 @@ def employee_authorized_for_project(employee_name, project_id):
         if guide.employee == employee.e_id:
             return True
 
-    project = ProjectDataAccess(get_db()).get_project(project_id, False)
-    return employee.research_group == project.research_group
+    return False
 
 
 @bp.route('/project-page')
